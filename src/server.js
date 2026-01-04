@@ -1,9 +1,9 @@
 import dotenv from "dotenv";
 import app from "./app.js";
-const PORT = 3000;
+import { config } from "./config/config.js";
+const PORT = config.port;
 dotenv.config();
 
-app.listen(PORT, "127.0.0.1", err => {
-  
+app.listen(PORT, err => {
     console.log(`Server is running on port ${PORT}`);
 });
