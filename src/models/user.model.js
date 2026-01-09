@@ -24,13 +24,14 @@ const userSchema = new mongoose.Schema(
     { timestamp: true }
 );
 userSchema.pre("save", async function (next) {
-    if (!this.isModified("password")) return ;
+    if (!this.isModified("password")) return;
     this.password = await bcrypt.hash(this.password, 12);
-    
+
 });
 userSchema.methods.createPassword =
     async function (candidatePassword, userPassword) {
         return await bcrypt.compare(candidatePassword, userPassword);
     }
+const test = 'test'
 
 export const User = mongoose.model("user", userSchema);
