@@ -28,10 +28,10 @@ userSchema.pre("save", async function (next) {
     this.password = await bcrypt.hash(this.password, 12);
 
 });
-userSchema.methods.createPassword =
+userSchema.methods.correctPassword =
     async function (candidatePassword, userPassword) {
         return await bcrypt.compare(candidatePassword, userPassword);
     }
-const test = 'test'
+
 
 export const User = mongoose.model("user", userSchema);
