@@ -4,6 +4,10 @@ import { AppError } from "../utils/appError.js";
 export const getUser = catchAsync(async (req, res, next) => {
     const requestedUserId = req.params.id;
     const requestedUser = req.user;
+    const user = await User.findById(requestedUserId);
+    if (!requestedUserId) {
+        return next(new AppError("User does not exist", 401));
+    }
     if (
         requestedUser.role !== "admin" &&
         requestedUser.id !== requestedUserId
@@ -14,10 +18,6 @@ export const getUser = catchAsync(async (req, res, next) => {
                 403
             )
         );
-    }
-    const user = await User.findById(requestedUserId);
-    if (!requestedUserId) {
-        return next(new AppError("User does not exist", 401));
     }
     res.status(201).json({
         status: "success",
