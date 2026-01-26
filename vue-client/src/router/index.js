@@ -27,7 +27,6 @@ const router = createRouter({
     routes
 });
 router.beforeEach((to, from, next) => {
-    const isLoggedIn = false;
     if (to.meta.requiresAuth && !isLoggedIn) {
         next("/login")
     } else {
