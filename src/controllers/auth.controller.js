@@ -11,7 +11,7 @@ export const signup = catchAsync(async (req, res, next) => {
     });
     const token = signToken(user._id);
     user.password = undefined;
-    res.status(202).json({
+    res.status(201).json({
         status: "success",
         token,
         data: {
@@ -22,11 +22,11 @@ export const signup = catchAsync(async (req, res, next) => {
 export const login = catchAsync(async (req, res, next) => {
     const { email, password } = req.body;
     if (!email || !password) {
-        return new AppError("please provide email and password ", 400);
+        return next(new AppError("please provide email and password ", 400));
     }
     const user = await User.findOne({ email }).select("+password ");
     if (!user || !(await user.correctPassword(password, user.password))) {
-        return new AppError("incorrect email or password", 400);
+        return next(new AppError("incorrect email or password", 400));
     }
     const token = signToken(user._id);
     user.password = undefined

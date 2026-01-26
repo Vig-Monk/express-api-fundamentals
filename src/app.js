@@ -9,8 +9,8 @@ const app = express();
 app.use(express.json());
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1", testRoutes);
-app.use("/api", healthRoutes);
-app.use("/api", usersRoutes);
+app.use("/api/v1", healthRoutes);
+app.use("/api/v1", usersRoutes);
 app.use((req, res, next) => {
     next(new AppError(`cannot find ${req.originalUrl} on this server`, 404));
 });

@@ -3,6 +3,7 @@ import LoginView from "../views/LoginView.vue";
 import SignupView from "../views/SignupView.vue";
 import UserProfileView from "../views/UserProfileView.vue";
 import DashboardView from "../views/DashboardView.vue";
+import { authState } from "../stores/auth.js"
 const routes = [
     {
         path: "/login",
@@ -27,7 +28,7 @@ const router = createRouter({
     routes
 });
 router.beforeEach((to, from, next) => {
-    if (to.meta.requiresAuth && !isLoggedIn) {
+    if (to.meta.requiresAuth && !authState.token) {
         next("/login")
     } else {
         next()

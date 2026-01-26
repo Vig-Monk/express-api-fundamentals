@@ -1,10 +1,10 @@
-import axios from "axios"
-const API_URL = "http://localhost:3000/api/v1/auth"
-export const login = async (payload)=> {
-	const res = await axios.push(`${API_URL}/login`,payload)
+import api from "./axios.js"
+const API_URL = "auth"
+export const login = async (payload) => {
+	const res = await api.post(`${API_URL}/login`, payload)
 	return res.data
 }
-export const signup =async (payload)=>{
-	const res = await axios.push(`${API_URL}/signup`, payload)
+export const signup = async (payload) => {
+	const res = await api.post(`${API_URL}/signup`, payload)
 	return res.data
 }
