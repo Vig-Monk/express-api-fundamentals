@@ -21,6 +21,14 @@ const routes = [
     {
         path: "/users/:id",
         component: UserProfileView
+    },
+    {
+    	path: "/admin",
+    	component: ()=>import('../views/Admin.vue'),
+    	meta:{
+    		requiresAuth:true,
+    		requiresRole:'admin'
+    	}
     }
 ];
 const router = createRouter({

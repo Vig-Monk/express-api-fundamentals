@@ -41,52 +41,61 @@ The content is organized as follows:
 </file_summary>
 
 <directory_structure>
+src/
+  config/
+    config.js
+    database.js
+  controllers/
+    auth.controller.js
+    user.controller.js
+  middleware/
+    auth.middleware.js
+    error.middleware.js
+    restrict.middleware.js
+    validateUsers.js
+  models/
+    user.model.js
+  routes/
+    auth.routes.js
+    health.routes.js
+    test.routes.js
+    users.routes.js
+  utils/
+    appError.js
+    catchAsync.js
+    signToken.js
+  app.js
+  server.js
+vue-client/
+  public/
+    vite.svg
+  src/
+    router/
+      index.js
+    services/
+      auth.service.js
+      axios.js
+    stores/
+      auth.js
+    views/
+      DashboardView.vue
+      LoginView.vue
+      SignupView.vue
+      UserProfileView.vue
+    App.vue
+    main.js
+    style.css
+  .gitignore
+  index.html
+  package.json
+  README.md
+  vite.config.js
 .gitignore
 package.json
-src/app.js
-src/config/config.js
-src/config/database.js
-src/controllers/auth.controller.js
-src/controllers/user.controller.js
-src/middleware/auth.middleware.js
-src/middleware/error.middleware.js
-src/middleware/restrict.middleware.js
-src/middleware/validateUsers.js
-src/models/user.model.js
-src/routes/auth.routes.js
-src/routes/health.routes.js
-src/routes/test.routes.js
-src/routes/users.routes.js
-src/server.js
-src/utils/appError.js
-src/utils/catchAsync.js
-src/utils/signToken.js
-vue-client/.gitignore
-vue-client/index.html
-vue-client/package.json
-vue-client/public/vite.svg
-vue-client/README.md
-vue-client/src/App.vue
-vue-client/src/main.js
-vue-client/src/router/index.js
-vue-client/src/services/auth.service.js
-vue-client/src/services/axios.js
-vue-client/src/stores/auth.js
-vue-client/src/style.css
-vue-client/src/views/DashboardView.vue
-vue-client/src/views/LoginView.vue
-vue-client/src/views/SignupView.vue
-vue-client/src/views/UserProfileView.vue
-vue-client/vite.config.js
 </directory_structure>
 
 <files>
 This section contains the contents of the repository's files.
-
-<file path=".gitignore">
-node_modules
-.env
-</file>
 
 <file path="src/middleware/auth.middleware.js">
 import {User} from "../models/user.model.js";
@@ -144,119 +153,37 @@ export const catchAsync = function (fn) {
 };
 </file>
 
-<file path="vue-client/index.html">
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>vue-client</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
-</html>
-</file>
-
-<file path="vue-client/package.json">
-{
-  "name": "vue-client",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "vue": "^3.5.24",
-    "vue-router": "^4.6.4"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-vue": "^6.0.1",
-    "vite": "^7.2.4"
-  }
-}
-</file>
-
 <file path="vue-client/public/vite.svg">
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="31.88" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 257"><defs><linearGradient id="IconifyId1813088fe1fbc01fb466" x1="-.828%" x2="57.636%" y1="7.652%" y2="78.411%"><stop offset="0%" stop-color="#41D1FF"></stop><stop offset="100%" stop-color="#BD34FE"></stop></linearGradient><linearGradient id="IconifyId1813088fe1fbc01fb467" x1="43.376%" x2="50.316%" y1="2.242%" y2="89.03%"><stop offset="0%" stop-color="#FFEA83"></stop><stop offset="8.333%" stop-color="#FFDD35"></stop><stop offset="100%" stop-color="#FFA800"></stop></linearGradient></defs><path fill="url(#IconifyId1813088fe1fbc01fb466)" d="M255.153 37.938L134.897 252.976c-2.483 4.44-8.862 4.466-11.382.048L.875 37.958c-2.746-4.814 1.371-10.646 6.827-9.67l120.385 21.517a6.537 6.537 0 0 0 2.322-.004l117.867-21.483c5.438-.991 9.574 4.796 6.877 9.62Z"></path><path fill="url(#IconifyId1813088fe1fbc01fb467)" d="M185.432.063L96.44 17.501a3.268 3.268 0 0 0-2.634 3.014l-5.474 92.456a3.268 3.268 0 0 0 3.997 3.378l24.777-5.718c2.318-.535 4.413 1.507 3.936 3.838l-7.361 36.047c-.495 2.426 1.782 4.5 4.151 3.78l15.304-4.649c2.372-.72 4.652 1.36 4.15 3.788l-11.698 56.621c-.732 3.542 3.979 5.473 5.943 2.437l1.313-2.028l72.516-144.72c1.215-2.423-.88-5.186-3.54-4.672l-25.505 4.922c-2.396.462-4.435-1.77-3.759-4.114l16.646-57.705c.677-2.35-1.37-4.583-3.769-4.113Z"></path></svg>
 </file>
 
-<file path="vue-client/README.md">
-# Vue 3 + Vite
-
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
-
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+<file path="vue-client/src/views/DashboardView.vue">
+<script setup></script>
+<template> <h2>hello boy</h2></template>
+<style></style>
 </file>
 
-<file path="vue-client/src/services/auth.service.js">
-import api from "./axios.js"
-const API_URL = "auth"
-export const login = async (payload) => {
-	const res = await api.post(`${API_URL}/login`, payload)
-	return res.data
+<file path="vue-client/src/views/UserProfileView.vue">
+<script setup>
+    import {computed} from "vue"
+import {useRoute, useRouter} from "vue-router"
+const router = useRouter()
+const route = useRoute()
+const userId = computed(()=>route.params.id)
+const navigateToUser = () => {
+  router.push("/users/12")
 }
-export const signup = async (payload) => {
-	const res = await api.post(`${API_URL}/signup`, payload)
-	return res.data
-}
-</file>
+console.log(userId)
+</script>
+<template>
+<h1>User area {{ userId }}
+<button @click="navigateToUser">Go now</button>
 
-<file path="vue-client/src/services/axios.js">
-import axios from 'axios'
-import { authState, logout } from '../stores/auth.js'
-import router from "../router"
-const api = axios.create({
-	baseURL: '/api/v1/'
-})
-api.interceptors.request.use((config) => {
-	if (authState.token) {
-		config.headers.Authorization = `Bearer ${authState.token}`
-	}
-	return config
-})
-api.interceptors.response.use((config) => {
-	(res) => {
-		return res;
-	}
-	(err) => {
-		const status = err.response?.status;
-		if (status === 401) {
-			logout()
-			router.push("/login")
-		}
-		if (status === 403) {
-			alert("Access denied")
-		}
-		return Promise.reject(err)
-	}
-})
-export default api
-</file>
+</h1>
+</template>
+<style>
 
-<file path="vue-client/src/stores/auth.js">
-import { reactive } from "vue";
-export const authState = reactive({
-    token: localStorage.getItem('token'),
-    user: null,
-
-});
-export const setAuth = (token, user) => {
-    authState.token = token,
-        authState.user = user
-    localStorage.setItem("token", token)
-
-}
-export const logout = () => {
-    authState.token = null
-    authState.user = null
-    localStorage.removeItem("token")
-}
+</style>
 </file>
 
 <file path="vue-client/src/style.css">
@@ -341,108 +268,55 @@ button:focus-visible {
 }
 </file>
 
-<file path="vue-client/src/views/DashboardView.vue">
-<script setup></script>
-<template> <h2>hello boy</h2></template>
-<style></style>
+<file path="vue-client/index.html">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>vue-client</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
 </file>
 
-<file path="vue-client/src/views/SignupView.vue">
-<script setup>
-import { ref } from "vue"
-import { signup } from "../services/auth.service"
-import { setAuth } from "../stores/auth"
-import { useRouter } from "vue-router"
-
-const router = useRouter()
-const name = ref('')
-const email = ref("")
-const password = ref("")
-
-const handleSignin = async () => {
-    try {
-        const res = await signup({
-            name: name.value,
-            email: email.value,
-            password: password.value
-        })
-        setAuth(res.token, res.data.user)
-        router.push("/dashboard")
-
-    } catch (err) {
-        console.error("signup error", err)
-        alert(err.res?.data?.message || "something went wrong")
-
-    }
-}
-
-</script>
-<template>
-    <form @submit.prevent="handleSignin">
-        <input v-model="name" placeholder="name" />
-        <input v-model="email" placeholder="email" />
-        <input v-model="password" placeholder="password" />
-        <button>Sign-up</button>
-    </form>
-</template>
-</file>
-
-<file path="vue-client/src/views/UserProfileView.vue">
-<script setup>
-    import {computed} from "vue"
-import {useRoute, useRouter} from "vue-router"
-const router = useRouter()
-const route = useRoute()
-const userId = computed(()=>route.params.id)
-const navigateToUser = () => {
-  router.push("/users/12")
-}
-console.log(userId)
-</script>
-<template>
-<h1>User area {{ userId }}
-<button @click="navigateToUser">Go now</button>
-
-</h1>
-</template>
-<style>
-
-</style>
-</file>
-
-<file path="vue-client/vite.config.js">
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [vue()],
-  server: {
-    proxy: {
-      '/api': {
-        target: 'http://localhost:3000',
-        changeOrigin: true,
-        // This rewrites the path if your backend doesn't expect the prefix
-        // rewrite: (path) => path.replace(/^\/api/, ''), 
-      },
-    },
+<file path="vue-client/package.json">
+{
+  "name": "vue-client",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
-})
+  "dependencies": {
+    "vue": "^3.5.24",
+    "vue-router": "^4.6.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.1",
+    "vite": "^7.2.4"
+  }
+}
 </file>
 
-<file path="src/config/database.js">
-import mongoose from "mongoose";
-import { config } from "./config.js";
-export const connectDB = async () => {
-    try {
-        await mongoose.connect(config.mongoUri);
-        console.log(config.jwtExpiresIn)
-        console.log("mongodb connected✅");
-    } catch (err) {
-        console.error(err);
-        process.exit(1);
-    }
-};
+<file path="vue-client/README.md">
+# Vue 3 + Vite
+
+This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+
+Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+</file>
+
+<file path=".gitignore">
+node_modules
+.env
 </file>
 
 <file path="src/controllers/user.controller.js">
@@ -576,6 +450,287 @@ export const signToken = id => {
 };
 </file>
 
+<file path="vue-client/src/services/auth.service.js">
+import api from "./axios.js"
+const API_URL = "auth"
+export const login = async (payload) => {
+	const res = await api.post(`${API_URL}/login`, payload)
+	return res.data
+}
+export const signup = async (payload) => {
+	const res = await api.post(`${API_URL}/signup`, payload)
+	return res.data
+}
+</file>
+
+<file path="vue-client/src/services/axios.js">
+import axios from 'axios'
+import { authState, logout } from '../stores/auth.js'
+import router from "../router"
+const api = axios.create({
+	baseURL: '/api/v1/'
+})
+api.interceptors.request.use((config) => {
+	if (authState.token) {
+		config.headers.Authorization = `Bearer ${authState.token}`
+	}
+	return config
+})
+api.interceptors.response.use(
+	(res) => {
+		return res;
+	},
+	(err) => {
+		const status = err.response?.status;
+		if (status === 401) {
+			logout()
+			router.push("/login")
+		}
+		if (status === 403) {
+			alert("Access denied")
+		}
+		return Promise.reject(err)
+	}
+)
+export default api
+</file>
+
+<file path="vue-client/src/stores/auth.js">
+import { reactive } from "vue";
+export const authState = reactive({
+    token: localStorage.getItem('token'),
+    user: null,
+
+});
+export const setAuth = (token, user) => {
+    authState.token = token,
+        authState.user = user
+    localStorage.setItem("token", token)
+
+}
+export const logout = () => {
+    authState.token = null
+    authState.user = null
+    localStorage.removeItem("token")
+}
+</file>
+
+<file path="vue-client/src/views/SignupView.vue">
+<script setup>
+import { ref } from "vue"
+import { signup } from "../services/auth.service"
+import { setAuth } from "../stores/auth"
+import { useRouter } from "vue-router"
+
+const router = useRouter()
+const name = ref('')
+const email = ref("")
+const password = ref("")
+const error = ref("")
+const loading = ref(false)
+
+const handleSignup = async () => {
+    loading.value = true;
+    error.value = "";
+
+    try {
+        const res = await signup({
+            name: name.value,
+            email: email.value,
+            password: password.value
+        })
+        setAuth(res.token, res.data.user)
+        router.push("/dashboard")
+
+    } catch (err) {
+        console.error("signup error", err)
+        error.value = err.response?.data?.message || "Something went wrong"
+    } finally {
+        loading.value = false;
+    }
+}
+</script>
+
+<template>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>Create Account</h1>
+                <p>Sign up to get started</p>
+            </div>
+
+            <form @submit.prevent="handleSignup" class="auth-form">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input id="name" v-model="name" type="text" placeholder="Enter your full name" required
+                        :disabled="loading" />
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input id="email" v-model="email" type="email" placeholder="Enter your email" required
+                        :disabled="loading" />
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input id="password" v-model="password" type="password"
+                        placeholder="Enter your password (min 8 characters)" required minlength="8"
+                        :disabled="loading" />
+                </div>
+
+                <p v-if="error" class="error-message">{{ error }}</p>
+
+                <button type="submit" class="submit-btn" :disabled="loading">
+                    <span v-if="!loading">Sign Up</span>
+                    <span v-else>Creating account...</span>
+                </button>
+
+                <p class="auth-footer">
+                    Already have an account?
+                    <router-link to="/login">Log in</router-link>
+                </p>
+            </form>
+        </div>
+    </div>
+</template>
+
+<style scoped>
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+}
+
+.auth-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 420px;
+    padding: 40px;
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.auth-header h1 {
+    color: #1a202c;
+    font-size: 28px;
+    margin: 0 0 8px 0;
+    font-weight: 700;
+}
+
+.auth-header p {
+    color: #718096;
+    font-size: 14px;
+    margin: 0;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    color: #2d3748;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.form-group input {
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s;
+    background: white;
+    color: #1a202c;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group input:disabled {
+    background: #f7fafc;
+    cursor: not-allowed;
+}
+
+.form-group input::placeholder {
+    color: #a0aec0;
+}
+
+.error-message {
+    color: #e53e3e;
+    font-size: 14px;
+    margin: 0;
+    padding: 12px;
+    background: #fff5f5;
+    border-radius: 8px;
+    border-left: 4px solid #e53e3e;
+}
+
+.submit-btn {
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+}
+
+.submit-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+.submit-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.auth-footer {
+    text-align: center;
+    color: #718096;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+.auth-footer a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+</style>
+</file>
+
 <file path="vue-client/.gitignore">
 # Logs
 logs
@@ -603,41 +758,24 @@ dist-ssr
 *.sw?
 </file>
 
-<file path="vue-client/src/views/LoginView.vue">
-<script setup>
-import { ref } from "vue";
-import { useRouter } from "vue-router";
-import { login } from "../services/auth.service.js";
-import { authState } from "../stores/auth.js";
+<file path="vue-client/vite.config.js">
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
 
-const email = ref("");
-const password = ref("");
-const router = useRouter();
-const error = ref("")
-const handleLogin = async () => {
-    try {
-        const res = await login({
-            email: email.value,
-            password: password.value
-        });
-        setAuth(res.token, res.data.user)
-        router.push("/dashboard");
-    } catch {
-        error.value = "Invalid email or password"
-    }
-
-};
-</script>
-<template>
-    <div>
-        <form @submit.prevent="handleLogin">
-            <input v-model="email" placeholder="enail" />
-            <input v-model="password" type="password" placeholder="password" />
-            <button>Login</button>
-            <p v-if="error">{{ error }}</p>
-        </form>
-    </div>
-</template>
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [vue()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        // This rewrites the path if your backend doesn't expect the prefix
+        // rewrite: (path) => path.replace(/^\/api/, ''), 
+      },
+    },
+  },
+})
 </file>
 
 <file path="src/config/config.js">
@@ -650,6 +788,262 @@ export const config = {
     jwtsecret: process.env.JWT_SECRET,
     jwtExpiresIn: process.env.JWT_EXPIRES_IN,
 }
+</file>
+
+<file path="src/config/database.js">
+import mongoose from "mongoose";
+import { config } from "./config.js";
+export const connectDB = async () => {
+    try {
+        await mongoose.connect(config.mongoUri);
+        console.log(config.jwtExpiresIn)
+        console.log("mongodb connected✅");
+    } catch (err) {
+        console.error(err);
+        process.exit(1);
+    }
+};
+</file>
+
+<file path="src/middleware/error.middleware.js">
+import { config } from "../config/config.js";
+const sendErrorDev = (err, res) => {
+    res.status(err.statusCode || 500).json({
+        status: err.status || "error",
+        message: err.message,
+        stack: err.stack,
+        error: err
+    });
+};
+const sendErrorProd = (err,res) => {
+    if (err.isOperational) {
+        res.status(err.statusCode).json({
+            status: err.status,
+            message: err.message
+        });
+    } else {
+        console.error("error", err);
+        res.status(500).json({
+            status: "error",
+            message: "something went wrong"
+        });
+    }
+};
+export const errorHandler = (err, req, res, next) => {
+    err.statusCode = err.statusCode || 500;
+    err.status = err.status || "error";
+    if (config.env === "development") {
+        sendErrorDev(err, res);
+    } else {
+        sendErrorProd(err, res);
+    }
+};
+</file>
+
+<file path="vue-client/src/views/LoginView.vue">
+<script setup>
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { login } from "../services/auth.service.js";
+import { setAuth } from "../stores/auth.js";
+
+const email = ref("");
+const password = ref("");
+const router = useRouter();
+const error = ref("");
+const loading = ref(false);
+
+const handleLogin = async () => {
+    loading.value = true;
+    error.value = "";
+
+    try {
+        const res = await login({
+            email: email.value,
+            password: password.value
+        });
+        setAuth(res.token, res.data.user);
+        router.push("/dashboard");
+    } catch (err) {
+        console.error("Login error:", err);
+        error.value = err.response?.data?.message || "Invalid email or password";
+    } finally {
+        loading.value = false;
+    }
+};
+</script>
+
+<template>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>Welcome Back</h1>
+                <p>Log in to your account</p>
+            </div>
+
+            <form @submit.prevent="handleLogin" class="auth-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input id="email" v-model="email" type="email" placeholder="Enter your email" required
+                        :disabled="loading" />
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input id="password" v-model="password" type="password" placeholder="Enter your password" required
+                        :disabled="loading" />
+                </div>
+
+                <p v-if="error" class="error-message">{{ error }}</p>
+
+                <button type="submit" class="submit-btn" :disabled="loading">
+                    <span v-if="!loading">Log In</span>
+                    <span v-else>Logging in...</span>
+                </button>
+
+                <p class="auth-footer">
+                    Don't have an account?
+                    <router-link to="/signup">Sign up</router-link>
+                </p>
+            </form>
+        </div>
+    </div>
+</template>
+
+<style scoped>
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+}
+
+.auth-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 420px;
+    padding: 40px;
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.auth-header h1 {
+    color: #1a202c;
+    font-size: 28px;
+    margin: 0 0 8px 0;
+    font-weight: 700;
+}
+
+.auth-header p {
+    color: #718096;
+    font-size: 14px;
+    margin: 0;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    color: #2d3748;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.form-group input {
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s;
+    background: white;
+    color: #1a202c;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group input:disabled {
+    background: #f7fafc;
+    cursor: not-allowed;
+}
+
+.form-group input::placeholder {
+    color: #a0aec0;
+}
+
+.error-message {
+    color: #e53e3e;
+    font-size: 14px;
+    margin: 0;
+    padding: 12px;
+    background: #fff5f5;
+    border-radius: 8px;
+    border-left: 4px solid #e53e3e;
+}
+
+.submit-btn {
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+}
+
+.submit-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+.submit-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.auth-footer {
+    text-align: center;
+    color: #718096;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+.auth-footer a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+</style>
 </file>
 
 <file path="src/controllers/auth.controller.js">
@@ -695,48 +1089,19 @@ export const login = catchAsync(async (req, res, next) => {
 });
 </file>
 
-<file path="src/middleware/error.middleware.js">
-import { config } from "../config/config.js";
-const sendErrorDev = (err, res) => {
-    res.status(err.statusCode || 500).json({
-        status: err.status || "error",
-        message: err.message,
-        stack: err.stack,
-        error: err
+<file path="src/server.js">
+import { connectDB } from "./config/database.js";
+import app from "./app.js";
+import { config } from "./config/config.js";
+const PORT = config.port;
+const startServer = async () => {
+    await connectDB();
+
+    app.listen(PORT, err => {
+        console.log(`Server is running on port ${PORT}`);
     });
 };
-const sendErrorProd = (err,res) => {
-    if (err.isOperational) {
-        res.status(err.statusCode).json({
-            status: err.status,
-            message: err.message
-        });
-    } else {
-        console.error("error", err);
-        res.status(500).json({
-            status: "error",
-            message: "something went wrong"
-        });
-    }
-};
-export const errorHandler = (err, req, res, next) => {
-    err.statusCode = err.statusCode || 500;
-    err.status = err.status || "error";
-    if (config.env === "development") {
-        sendErrorDev(err, res);
-    } else {
-        sendErrorProd(err, res);
-    }
-};
-</file>
-
-<file path="vue-client/src/main.js">
-import { createApp } from 'vue'
-import './style.css'
-import App from './App.vue'
-import router from "./router/index.js"
-
-createApp(App).use(router).mount('#app')
+startServer();
 </file>
 
 <file path="vue-client/src/router/index.js">
@@ -781,50 +1146,13 @@ router.beforeEach((to, from, next) => {
 export default router;
 </file>
 
-<file path="src/app.js">
-import express from "express";
-import healthRoutes from "./routes/health.routes.js";
-import usersRoutes from "./routes/users.routes.js";
-import testRoutes from "./routes/test.routes.js";
-import authRoutes from "./routes/auth.routes.js";
-import { errorHandler } from "./middleware/error.middleware.js";
-import { AppError } from "./utils/appError.js";
-const app = express();
-app.use(express.json());
-app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1", testRoutes);
-app.use("/api/v1", healthRoutes);
-app.use("/api/v1", usersRoutes);
-app.use((req, res, next) => {
-    next(new AppError(`cannot find ${req.originalUrl} on this server`, 404));
-});
-app.use(errorHandler);
-export default app;
-</file>
+<file path="vue-client/src/main.js">
+import { createApp } from 'vue'
+import './style.css'
+import App from './App.vue'
+import router from "./router/index.js"
 
-<file path="src/server.js">
-import { connectDB } from "./config/database.js";
-import app from "./app.js";
-import { config } from "./config/config.js";
-const PORT = config.port;
-const startServer = async () => {
-    await connectDB();
-
-    app.listen(PORT, err => {
-        console.log(`Server is running on port ${PORT}`);
-    });
-};
-startServer();
-</file>
-
-<file path="vue-client/src/App.vue">
-<script setup></script>
-<template>
-    <router-link to="/login">Login</router-link>
-    <router-link to="/signup">Signup</router-link>
-    <router-view />
-</template>
-<style scoped></style>
+createApp(App).use(router).mount('#app')
 </file>
 
 <file path="src/models/user.model.js">
@@ -870,6 +1198,37 @@ userSchema.methods.correctPassword =
 
 
 export const User = mongoose.model("user", userSchema);
+</file>
+
+<file path="src/app.js">
+import express from "express";
+import healthRoutes from "./routes/health.routes.js";
+import usersRoutes from "./routes/users.routes.js";
+import testRoutes from "./routes/test.routes.js";
+import authRoutes from "./routes/auth.routes.js";
+import { errorHandler } from "./middleware/error.middleware.js";
+import { AppError } from "./utils/appError.js";
+const app = express();
+app.use(express.json());
+app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1", testRoutes);
+app.use("/api/v1", healthRoutes);
+app.use("/api/v1", usersRoutes);
+app.use((req, res, next) => {
+    next(new AppError(`cannot find ${req.originalUrl} on this server`, 404));
+});
+app.use(errorHandler);
+export default app;
+</file>
+
+<file path="vue-client/src/App.vue">
+<script setup></script>
+<template>
+    <router-link to="/login">Login</router-link>
+    <router-link to="/signup">Signup</router-link>
+    <router-view />
+</template>
+<style scoped></style>
 </file>
 
 <file path="package.json">

@@ -1,20 +1,17 @@
 <script setup>
-    import {computed} from "vue"
-import {useRoute, useRouter} from "vue-router"
-const router = useRouter()
-const route = useRoute()
-const userId = computed(()=>route.params.id)
-const navigateToUser = () => {
-  router.push("/users/12")
-}
-console.log(userId)
+import { computed } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { authState } from "../stores/auth.js";
+const route = useRoute();
+const requestedId = route.params.id;
+const isOwner = authState.user && requestedId === authState.user.id;
 </script>
 <template>
-<h1>User area {{ userId }}
-<button @click="navigateToUser">Go now</button>
-
-</h1>
+    <h2>
+        user profile
+    </h2>
+    <button v-if="isOwner">
+    	Edit profile 
+    </button>
 </template>
-<style>
-
-</style>
+<style></style>
