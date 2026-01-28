@@ -32,7 +32,7 @@ The content is organized as follows:
 <notes>
 - Some files may have been excluded based on .gitignore rules and Repomix's configuration
 - Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
-- Files matching these patterns are excluded: node_modules, package-lock.json, dist, *.png, *.jpg, *.svg, .git
+- Files matching these patterns are excluded: node-modules, package-lock.json, dist, *.png, *.jpg, *.svg, .git
 - Files matching patterns in .gitignore are excluded
 - Files matching default ignore patterns are excluded
 - Files are sorted by Git change count (files with more changes are at the bottom)
@@ -41,61 +41,53 @@ The content is organized as follows:
 </file_summary>
 
 <directory_structure>
-src/
-  config/
-    config.js
-    database.js
-  controllers/
-    auth.controller.js
-    user.controller.js
-  middleware/
-    auth.middleware.js
-    error.middleware.js
-    restrict.middleware.js
-    validateUsers.js
-  models/
-    user.model.js
-  routes/
-    auth.routes.js
-    health.routes.js
-    test.routes.js
-    users.routes.js
-  utils/
-    appError.js
-    catchAsync.js
-    signToken.js
-  app.js
-  server.js
-vue-client/
-  public/
-    vite.svg
-  src/
-    router/
-      index.js
-    services/
-      auth.service.js
-      axios.js
-    stores/
-      auth.js
-    views/
-      DashboardView.vue
-      LoginView.vue
-      SignupView.vue
-      UserProfileView.vue
-    App.vue
-    main.js
-    style.css
-  .gitignore
-  index.html
-  package.json
-  README.md
-  vite.config.js
 .gitignore
 package.json
+src/app.js
+src/config/config.js
+src/config/database.js
+src/controllers/auth.controller.js
+src/controllers/user.controller.js
+src/middleware/auth.middleware.js
+src/middleware/error.middleware.js
+src/middleware/restrict.middleware.js
+src/middleware/validateUsers.js
+src/models/user.model.js
+src/routes/auth.routes.js
+src/routes/health.routes.js
+src/routes/test.routes.js
+src/routes/users.routes.js
+src/server.js
+src/utils/appError.js
+src/utils/catchAsync.js
+src/utils/signToken.js
+vue-client/.gitignore
+vue-client/index.html
+vue-client/package.json
+vue-client/public/vite.svg
+vue-client/README.md
+vue-client/src/App.vue
+vue-client/src/main.js
+vue-client/src/router/index.js
+vue-client/src/services/auth.service.js
+vue-client/src/services/axios.js
+vue-client/src/stores/auth.js
+vue-client/src/style.css
+vue-client/src/views/Admin.vue
+vue-client/src/views/DashboardView.vue
+vue-client/src/views/LoginView.vue
+vue-client/src/views/SignupView.vue
+vue-client/src/views/UserProfileView.vue
+vue-client/vite.config.js
 </directory_structure>
 
 <files>
 This section contains the contents of the repository's files.
+
+<file path=".gitignore">
+node_modules
+.env
+</file>
 
 <file path="src/middleware/auth.middleware.js">
 import {User} from "../models/user.model.js";
@@ -153,37 +145,54 @@ export const catchAsync = function (fn) {
 };
 </file>
 
+<file path="vue-client/index.html">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>vue-client</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
+</file>
+
+<file path="vue-client/package.json">
+{
+  "name": "vue-client",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.5.24",
+    "vue-router": "^4.6.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.1",
+    "vite": "^7.2.4"
+  }
+}
+</file>
+
 <file path="vue-client/public/vite.svg">
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="31.88" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 257"><defs><linearGradient id="IconifyId1813088fe1fbc01fb466" x1="-.828%" x2="57.636%" y1="7.652%" y2="78.411%"><stop offset="0%" stop-color="#41D1FF"></stop><stop offset="100%" stop-color="#BD34FE"></stop></linearGradient><linearGradient id="IconifyId1813088fe1fbc01fb467" x1="43.376%" x2="50.316%" y1="2.242%" y2="89.03%"><stop offset="0%" stop-color="#FFEA83"></stop><stop offset="8.333%" stop-color="#FFDD35"></stop><stop offset="100%" stop-color="#FFA800"></stop></linearGradient></defs><path fill="url(#IconifyId1813088fe1fbc01fb466)" d="M255.153 37.938L134.897 252.976c-2.483 4.44-8.862 4.466-11.382.048L.875 37.958c-2.746-4.814 1.371-10.646 6.827-9.67l120.385 21.517a6.537 6.537 0 0 0 2.322-.004l117.867-21.483c5.438-.991 9.574 4.796 6.877 9.62Z"></path><path fill="url(#IconifyId1813088fe1fbc01fb467)" d="M185.432.063L96.44 17.501a3.268 3.268 0 0 0-2.634 3.014l-5.474 92.456a3.268 3.268 0 0 0 3.997 3.378l24.777-5.718c2.318-.535 4.413 1.507 3.936 3.838l-7.361 36.047c-.495 2.426 1.782 4.5 4.151 3.78l15.304-4.649c2.372-.72 4.652 1.36 4.15 3.788l-11.698 56.621c-.732 3.542 3.979 5.473 5.943 2.437l1.313-2.028l72.516-144.72c1.215-2.423-.88-5.186-3.54-4.672l-25.505 4.922c-2.396.462-4.435-1.77-3.759-4.114l16.646-57.705c.677-2.35-1.37-4.583-3.769-4.113Z"></path></svg>
 </file>
 
-<file path="vue-client/src/views/DashboardView.vue">
-<script setup></script>
-<template> <h2>hello boy</h2></template>
-<style></style>
-</file>
+<file path="vue-client/README.md">
+# Vue 3 + Vite
 
-<file path="vue-client/src/views/UserProfileView.vue">
-<script setup>
-    import {computed} from "vue"
-import {useRoute, useRouter} from "vue-router"
-const router = useRouter()
-const route = useRoute()
-const userId = computed(()=>route.params.id)
-const navigateToUser = () => {
-  router.push("/users/12")
-}
-console.log(userId)
-</script>
-<template>
-<h1>User area {{ userId }}
-<button @click="navigateToUser">Go now</button>
+This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
 
-</h1>
-</template>
-<style>
-
-</style>
+Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
 </file>
 
 <file path="vue-client/src/style.css">
@@ -268,55 +277,8 @@ button:focus-visible {
 }
 </file>
 
-<file path="vue-client/index.html">
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>vue-client</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
-</html>
-</file>
+<file path="vue-client/src/views/Admin.vue">
 
-<file path="vue-client/package.json">
-{
-  "name": "vue-client",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "vue": "^3.5.24",
-    "vue-router": "^4.6.4"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-vue": "^6.0.1",
-    "vite": "^7.2.4"
-  }
-}
-</file>
-
-<file path="vue-client/README.md">
-# Vue 3 + Vite
-
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
-
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
-</file>
-
-<file path=".gitignore">
-node_modules
-.env
 </file>
 
 <file path="src/controllers/user.controller.js">
@@ -450,6 +412,33 @@ export const signToken = id => {
 };
 </file>
 
+<file path="vue-client/.gitignore">
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+</file>
+
 <file path="vue-client/src/services/auth.service.js">
 import api from "./axios.js"
 const API_URL = "auth"
@@ -495,24 +484,18 @@ api.interceptors.response.use(
 export default api
 </file>
 
-<file path="vue-client/src/stores/auth.js">
-import { reactive } from "vue";
-export const authState = reactive({
-    token: localStorage.getItem('token'),
-    user: null,
-
-});
-export const setAuth = (token, user) => {
-    authState.token = token,
-        authState.user = user
-    localStorage.setItem("token", token)
-
-}
-export const logout = () => {
-    authState.token = null
-    authState.user = null
-    localStorage.removeItem("token")
-}
+<file path="vue-client/src/views/DashboardView.vue">
+<script setup>
+import { authState } from "../stores/auth.js";
+</script>
+<template>
+    <h2>Dashboard</h2>
+    <h2>Hi, {[useState.user?.name}}</h2>
+    <div v-if="authState.user?.role === 'admin'">
+    	Admin panel 
+    </div>
+</template>
+<style></style>
 </file>
 
 <file path="vue-client/src/views/SignupView.vue">
@@ -731,31 +714,24 @@ const handleSignup = async () => {
 </style>
 </file>
 
-<file path="vue-client/.gitignore">
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+<file path="vue-client/src/views/UserProfileView.vue">
+<script setup>
+import { computed } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { authState } from "../stores/auth.js";
+const route = useRoute();
+const requestedId = route.params.id;
+const isOwner = authState.user && requestedId === authState.user.id;
+</script>
+<template>
+    <h2>
+        user profile
+    </h2>
+    <button v-if="isOwner">
+    	Edit profile 
+    </button>
+</template>
+<style></style>
 </file>
 
 <file path="vue-client/vite.config.js">
@@ -837,6 +813,25 @@ export const errorHandler = (err, req, res, next) => {
     } else {
         sendErrorProd(err, res);
     }
+};
+</file>
+
+<file path="vue-client/src/stores/auth.js">
+import { reactive } from "vue";
+export const authState = reactive({
+    token: localStorage.getItem("token"),
+    user: JSON.parse(localStorage.getItem("user"))
+});
+export const setAuth = (token, user) => {
+    (authState.token = token), (authState.user = user);
+    localStorage.setItem("token", token);
+    localStorage.setItem('user',JSON.stringify(user));
+};
+export const logout = () => {
+    authState.token = null;
+    authState.user = null;
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
 };
 </file>
 
@@ -1104,48 +1099,6 @@ const startServer = async () => {
 startServer();
 </file>
 
-<file path="vue-client/src/router/index.js">
-import { createRouter, createWebHistory } from "vue-router";
-import LoginView from "../views/LoginView.vue";
-import SignupView from "../views/SignupView.vue";
-import UserProfileView from "../views/UserProfileView.vue";
-import DashboardView from "../views/DashboardView.vue";
-import { authState } from "../stores/auth.js"
-const routes = [
-    {
-        path: "/login",
-        component: LoginView
-    },
-    {
-        path: "/dashboard",
-        component: DashboardView,
-        meta: { requiresAuth: true }
-    },
-    {
-        path: "/signup",
-        component: SignupView
-    },
-    {
-        path: "/users/:id",
-        component: UserProfileView
-    }
-];
-const router = createRouter({
-    history: createWebHistory(),
-    routes
-});
-router.beforeEach((to, from, next) => {
-    if (to.meta.requiresAuth && !authState.token) {
-        next("/login")
-    } else {
-        next()
-    }
-})
-
-
-export default router;
-</file>
-
 <file path="vue-client/src/main.js">
 import { createApp } from 'vue'
 import './style.css'
@@ -1153,6 +1106,27 @@ import App from './App.vue'
 import router from "./router/index.js"
 
 createApp(App).use(router).mount('#app')
+</file>
+
+<file path="src/app.js">
+import express from "express";
+import healthRoutes from "./routes/health.routes.js";
+import usersRoutes from "./routes/users.routes.js";
+import testRoutes from "./routes/test.routes.js";
+import authRoutes from "./routes/auth.routes.js";
+import { errorHandler } from "./middleware/error.middleware.js";
+import { AppError } from "./utils/appError.js";
+const app = express();
+app.use(express.json());
+app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1", testRoutes);
+app.use("/api/v1", healthRoutes);
+app.use("/api/v1", usersRoutes);
+app.use((req, res, next) => {
+    next(new AppError(`cannot find ${req.originalUrl} on this server`, 404));
+});
+app.use(errorHandler);
+export default app;
 </file>
 
 <file path="src/models/user.model.js">
@@ -1200,27 +1174,6 @@ userSchema.methods.correctPassword =
 export const User = mongoose.model("user", userSchema);
 </file>
 
-<file path="src/app.js">
-import express from "express";
-import healthRoutes from "./routes/health.routes.js";
-import usersRoutes from "./routes/users.routes.js";
-import testRoutes from "./routes/test.routes.js";
-import authRoutes from "./routes/auth.routes.js";
-import { errorHandler } from "./middleware/error.middleware.js";
-import { AppError } from "./utils/appError.js";
-const app = express();
-app.use(express.json());
-app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1", testRoutes);
-app.use("/api/v1", healthRoutes);
-app.use("/api/v1", usersRoutes);
-app.use((req, res, next) => {
-    next(new AppError(`cannot find ${req.originalUrl} on this server`, 404));
-});
-app.use(errorHandler);
-export default app;
-</file>
-
 <file path="vue-client/src/App.vue">
 <script setup></script>
 <template>
@@ -1255,6 +1208,61 @@ export default app;
     "mongoose": "^9.1.2"
   }
 }
+</file>
+
+<file path="vue-client/src/router/index.js">
+import { createRouter, createWebHistory } from "vue-router";
+import LoginView from "../views/LoginView.vue";
+import SignupView from "../views/SignupView.vue";
+import UserProfileView from "../views/UserProfileView.vue";
+import DashboardView from "../views/DashboardView.vue";
+import { authState } from "../stores/auth.js"
+const routes = [
+    {
+        path: "/login",
+        component: LoginView
+    },
+    {
+        path: "/dashboard",
+        component: DashboardView,
+        meta: { requiresAuth: true }
+    },
+    {
+        path: "/signup",
+        component: SignupView
+    },
+    {
+        path: "/users/:id",
+        component: UserProfileView
+    },
+    {
+        path: "/admin",
+        component: () => import('../views/Admin.vue'),
+        meta: {
+            requiresAuth: true,
+            requiresRole: 'admin'
+        }
+    }
+];
+const router = createRouter({
+    history: createWebHistory(),
+    routes
+});
+router.beforeEach((to, from, next) => {
+    const user = authState.user
+    if (to.meta.requiresAuth && !user) {
+        return next("/login")
+    }
+    if (to.meta.requiresRole && useTransition.role && to.meta.requiresRole) {
+        return next("/dashboard")
+    }
+    else {
+        next()
+    }
+})
+
+
+export default router;
 </file>
 
 </files>
