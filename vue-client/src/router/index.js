@@ -23,12 +23,12 @@ const routes = [
         component: UserProfileView
     },
     {
-    	path: "/admin",
-    	component: ()=>import('../views/Admin.vue'),
-    	meta:{
-    		requiresAuth:true,
-    		requiresRole:'admin'
-    	}
+        path: "/admin",
+        component: () => import('../views/Admin.vue'),
+        meta: {
+            requiresAuth: true,
+            requiresRole: 'admin'
+        }
     }
 ];
 const router = createRouter({
@@ -36,9 +36,14 @@ const router = createRouter({
     routes
 });
 router.beforeEach((to, from, next) => {
-    if (to.meta.requiresAuth && !authState.token) {
-        next("/login")
-    } else {
+    const user = authState.user
+    if (to.meta.requiresAuth && !user) {
+        return next("/login")
+    }
+    if (to.meta.requiresRole && useTransition.role && to.meta.requiresRole) {
+        return next("/dashboard")
+    }
+    else {
         next()
     }
 })
