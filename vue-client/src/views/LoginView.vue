@@ -23,7 +23,8 @@ const handleLogin = async () => {
         router.push("/dashboard");
     } catch (err) {
         console.error("Login error:", err);
-        error.value = err.response?.data?.message || "Invalid email or password";
+        error.value =
+            err.response?.data?.message || "Invalid email or password";
     } finally {
         loading.value = false;
     }
@@ -41,14 +42,26 @@ const handleLogin = async () => {
             <form @submit.prevent="handleLogin" class="auth-form">
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input id="email" v-model="email" type="email" placeholder="Enter your email" required
-                        :disabled="loading" />
+                    <input
+                        id="email"
+                        v-model="email"
+                        type="email"
+                        placeholder="Enter your email"
+                        required
+                        :disabled="loading"
+                    />
                 </div>
 
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input id="password" v-model="password" type="password" placeholder="Enter your password" required
-                        :disabled="loading" />
+                    <input
+                        id="password"
+                        v-model="password"
+                        type="password"
+                        placeholder="Enter your password"
+                        required
+                        :disabled="loading"
+                    />
                 </div>
 
                 <p v-if="error" class="error-message">{{ error }}</p>
@@ -73,7 +86,6 @@ const handleLogin = async () => {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     padding: 20px;
 }
 
@@ -159,7 +171,7 @@ const handleLogin = async () => {
 
 .submit-btn {
     padding: 14px 24px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: hsl(190.3, 0%, 11.8%);
     color: white;
     border: none;
     border-radius: 8px;

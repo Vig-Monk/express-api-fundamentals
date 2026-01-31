@@ -1,15 +1,15 @@
 <script setup>
-import { ref } from "vue"
-import { signup } from "../services/auth.service"
-import { setAuth } from "../stores/auth"
-import { useRouter } from "vue-router"
+import { ref } from "vue";
+import { signup } from "../services/auth.service";
+import { setAuth } from "../stores/auth";
+import { useRouter } from "vue-router";
 
-const router = useRouter()
-const name = ref('')
-const email = ref("")
-const password = ref("")
-const error = ref("")
-const loading = ref(false)
+const router = useRouter();
+const name = ref("");
+const email = ref("");
+const password = ref("");
+const error = ref("");
+const loading = ref(false);
 
 const handleSignup = async () => {
     loading.value = true;
@@ -20,17 +20,16 @@ const handleSignup = async () => {
             name: name.value,
             email: email.value,
             password: password.value
-        })
-        setAuth(res.token, res.data.user)
-        router.push("/dashboard")
-
+        });
+        setAuth(res.token, res.data.user);
+        router.push("/dashboard");
     } catch (err) {
-        console.error("signup error", err)
-        error.value = err.response?.data?.message || "Something went wrong"
+        console.error("signup error", err);
+        error.value = err.response?.data?.message || "Something went wrong";
     } finally {
         loading.value = false;
     }
-}
+};
 </script>
 
 <template>
@@ -44,21 +43,39 @@ const handleSignup = async () => {
             <form @submit.prevent="handleSignup" class="auth-form">
                 <div class="form-group">
                     <label for="name">Full Name</label>
-                    <input id="name" v-model="name" type="text" placeholder="Enter your full name" required
-                        :disabled="loading" />
+                    <input
+                        id="name"
+                        v-model="name"
+                        type="text"
+                        placeholder="Enter your full name"
+                        required
+                        :disabled="loading"
+                    />
                 </div>
 
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input id="email" v-model="email" type="email" placeholder="Enter your email" required
-                        :disabled="loading" />
+                    <input
+                        id="email"
+                        v-model="email"
+                        type="email"
+                        placeholder="Enter your email"
+                        required
+                        :disabled="loading"
+                    />
                 </div>
 
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input id="password" v-model="password" type="password"
-                        placeholder="Enter your password (min 8 characters)" required minlength="8"
-                        :disabled="loading" />
+                    <input
+                        id="password"
+                        v-model="password"
+                        type="password"
+                        placeholder="Enter your password (min 8 characters)"
+                        required
+                        minlength="8"
+                        :disabled="loading"
+                    />
                 </div>
 
                 <p v-if="error" class="error-message">{{ error }}</p>
@@ -83,7 +100,6 @@ const handleSignup = async () => {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     padding: 20px;
 }
 
@@ -169,7 +185,7 @@ const handleSignup = async () => {
 
 .submit-btn {
     padding: 14px 24px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background:hsl(190.3,0%,11.8%);
     color: white;
     border: none;
     border-radius: 8px;
