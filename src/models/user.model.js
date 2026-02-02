@@ -20,13 +20,13 @@ const userSchema = new mongoose.Schema(
             minlength: 8,
             select: false
         },
-        role:{
-        	type:String,
-        	enum:["admin","user"],
-        	default:"user"
+        role: {
+            type: String,
+            enum: ["admin", "user"],
+            default: "user"
         }
     },
-    { timestamp: true }
+    { timestamps: true }
 );
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return;

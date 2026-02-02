@@ -36,16 +36,18 @@ const router = createRouter({
     routes
 });
 router.beforeEach((to, from, next) => {
-    const user = authState.user
-    if (to.meta.requiresAuth && !user) {
+    if (!authState.initialized) {
+        return next(false)
+    }
+
+    if (to.meta.requiresAuth && !authState.user) {
         return next("/login")
     }
     if (to.meta.requiresRole && useTransition.role && to.meta.requiresRole) {
         return next("/dashboard")
     }
-    else {
-        next()
-    }
+    next()
+
 })
 
 

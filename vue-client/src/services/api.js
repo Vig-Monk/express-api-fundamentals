@@ -1,12 +1,11 @@
 import axios from 'axios'
-import { authState, logout } from '../stores/auth.js'
-import router from "../router"
 const api = axios.create({
-	baseURL: '/api/v1/'
+	baseURL: import.meta.env.VITE_API_URL
 })
 api.interceptors.request.use((config) => {
-	if (authState.token) {
-		config.headers.Authorization = `Bearer ${authState.token}`
+	const token = localStorage.getItem("token")
+	if (token) {
+		config.headers.Authorization = `Bearer ${token}`
 	}
 	return config
 })
@@ -17,11 +16,10 @@ api.interceptors.response.use(
 	(err) => {
 		const status = err.response?.status;
 		if (status === 401) {
-			logout()
-			router.push("/login")
+			console.warn("unauthorised - token invalid or expired")
 		}
 		if (status === 403) {
-			alert("Access denied")
+			console.warn("Forbidden-You don't have sufficienjt permissions")
 		}
 		return Promise.reject(err)
 	}
