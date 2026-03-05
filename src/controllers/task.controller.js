@@ -14,9 +14,10 @@ export const createTask = catchAsync(async (req, res, next) => {
     });
 });
 export const getTasks = catchAsync(async (req, res, next) => {
-    const filter = {
-        user: req.user.id
-    };
+    const filter = {};
+    if (req.user.role !== "admin") {
+        filter.user = req.user.id;
+    }
     //filtering
     if (req.query.completed !== undefined) {
         filter.completed = req.query.completed === "true";
@@ -43,4 +44,95 @@ export const getTasks = catchAsync(async (req, res, next) => {
             tasks
         }
     });
+});
+const getTaskStats = catchAsync(async (req, res, next) => {
+    const stats = await Task.aggregate([
+        {
+            $match: {
+                createdAt: {
+                    $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+                }
+            }
+        },
+        {
+            $group: {
+                _id: "$completed",
+                totalTasks: { $sum: 1 }
+            }
+        }
+    ]);
+    res.send(200).json({
+        status: "success",
+        data: {
+            stats
+        }
+    });
+});
+export const getTasksPerUser = catchAsync(async (req, res, next) => {
+    const stats = await Task.aggregate([
+        {
+            $group: {
+                _id: "$user",
+                totalTasks: { $sum: 1 }
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "_id",
+                foreignField: "_id",
+                as: "user"
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                userId: "$_id",
+                totalTasks: 1,
+                user: {
+                    $arrayElemAt: ["$user", 0]
+                }
+            }
+        }
+    ]);
+    res.status(200).json({
+        status: "success",
+        data: {
+            stats
+        }
+    });
+});
+export const getTasksPerDay = catchAsync(async () => {
+    const stats = await Task.aggregate([
+        {
+            $group: {
+                _id: {
+                    year: { $year: "$createdAt" },
+                    month: { $month: "$createdAt" },
+                    day: { $dayOfMonth: "$createdAt" }
+                },
+                totalTasks: { $sum: 1 }
+            }
+        },
+        {
+            $sort: {
+                "_id.year": 1,
+                "_id.month": 1,
+                "_id.day": 1
+            }
+        },
+        {
+        	$project:{
+        		_id:0,
+        		date:{
+        			$dateFromParts:{
+        				year:"_id.year",
+        				month:"_id.month",
+        				day:"_id.day"
+        			}
+        		},
+        		totalTasks:1
+        	}
+        }
+    ]);
 });

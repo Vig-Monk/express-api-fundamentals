@@ -3,11 +3,26 @@ import LoginView from "../views/LoginView.vue";
 import SignupView from "../views/SignupView.vue";
 import UserProfileView from "../views/UserProfileView.vue";
 import DashboardView from "../views/DashboardView.vue";
-import { authState } from "../stores/auth.js"
+import TasksView from "../views/TasksView.vue";
+import TaskDetailsView from "../views/TaskDetailsView.vue";
+import { authState } from "../stores/auth.js";
+
 const routes = [
     {
         path: "/login",
         component: LoginView
+    },
+    {
+    	path:'/tasks',
+    	name:'tasks',
+    	component: TasksView,
+    	meta:{requiresAuth: true}
+    }, 
+    {
+    	path: '/tasks/:id',
+    	name: 'task-detail',
+    	component:TaskDetailsView,
+    	meta: {requiresAuth: true}
     },
     {
         path: "/dashboard",
@@ -24,10 +39,10 @@ const routes = [
     },
     {
         path: "/admin",
-        component: () => import('../views/Admin.vue'),
+        component: () => import("../views/Admin.vue"),
         meta: {
             requiresAuth: true,
-            requiresRole: 'admin'
+            requiresRole: "admin"
         }
     }
 ];
@@ -37,18 +52,16 @@ const router = createRouter({
 });
 router.beforeEach((to, from, next) => {
     if (!authState.initialized) {
-        return next(false)
+        return next(false);
     }
 
     if (to.meta.requiresAuth && !authState.user) {
-        return next("/login")
+        return next("/login");
     }
     if (to.meta.requiresRole && useTransition.role && to.meta.requiresRole) {
-        return next("/dashboard")
+        return next("/dashboard");
     }
-    next()
-
-})
-
+    next();
+});
 
 export default router;

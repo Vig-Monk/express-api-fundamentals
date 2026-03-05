@@ -23,8 +23,7 @@ const handleLogin = async () => {
         router.push("/dashboard");
     } catch (err) {
         console.error("Login error:", err);
-        error.value =
-            err.response?.data?.message || "Invalid email or password";
+        error.value =    err.response?.data?.message || "Invalid email or password";
     } finally {
         loading.value = false;
     }
