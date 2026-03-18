@@ -1,66 +1,104 @@
 import { createRouter, createWebHistory } from "vue-router";
-import LoginView from "../views/LoginView.vue";
-import SignupView from "../views/SignupView.vue";
-import UserProfileView from "../views/UserProfileView.vue";
-import DashboardView from "../views/DashboardView.vue";
-import TasksView from "../views/TasksView.vue";
-import TaskDetailsView from "../views/TaskDetailsView.vue";
-import { authState } from "../stores/auth.js";
+import { authState, restoreAuth } from "../stores/auth.js";
+
+// Lazy-load all views — only auth pages are eager since they're the entry point
+import LoginView    from "../views/LoginView.vue";
+import SignupView   from "../views/SignupView.vue";
 
 const routes = [
+    // ── Root redirect ────────────────────────────────────────────────────────
+    {
+        path: "/",
+        redirect: () => (authState.user ? "/tasks" : "/login"),
+    },
+
+    // ── Guest-only ───────────────────────────────────────────────────────────
     {
         path: "/login",
-        component: LoginView
-    },
-    {
-    	path:'/tasks',
-    	name:'tasks',
-    	component: TasksView,
-    	meta:{requiresAuth: true}
-    }, 
-    {
-    	path: '/tasks/:id',
-    	name: 'task-detail',
-    	component:TaskDetailsView,
-    	meta: {requiresAuth: true}
-    },
-    {
-        path: "/dashboard",
-        component: DashboardView,
-        meta: { requiresAuth: true }
+        name: "login",
+        component: LoginView,
+        meta: { guestOnly: true },
     },
     {
         path: "/signup",
-        component: SignupView
+        name: "signup",
+        component: SignupView,
+        meta: { guestOnly: true },
+    },
+
+    // ── Auth-required ────────────────────────────────────────────────────────
+    {
+        path: "/tasks",
+        name: "tasks",
+        component: () => import("../views/TasksView.vue"),
+        meta: { requiresAuth: true },
+    },
+    {
+        path: "/tasks/:id",
+        name: "task-detail",
+        component: () => import("../views/TaskDetailsView.vue"),
+        meta: { requiresAuth: true },
+    },
+    {
+        path: "/dashboard",
+        name: "dashboard",
+        component: () => import("../views/DashboardView.vue"),
+        meta: { requiresAuth: true },
     },
     {
         path: "/users/:id",
-        component: UserProfileView
+        name: "user-profile",
+        component: () => import("../views/UserProfileView.vue"),
+        meta: { requiresAuth: true },
     },
+
+    // ── Admin-only ───────────────────────────────────────────────────────────
     {
         path: "/admin",
+        name: "admin",
         component: () => import("../views/Admin.vue"),
-        meta: {
-            requiresAuth: true,
-            requiresRole: "admin"
-        }
-    }
+        meta: { requiresAuth: true, requiresRole: "admin" },
+    },
+
+    // ── Catch-all ────────────────────────────────────────────────────────────
+    {
+        path: "/:pathMatch(.*)*",
+        redirect: "/",
+    },
 ];
+
 const router = createRouter({
     history: createWebHistory(),
-    routes
+    routes,
+    // Scroll to top on every navigation
+    scrollBehavior: () => ({ top: 0, behavior: "smooth" }),
 });
+
+// ── Navigation guard ─────────────────────────────────────────────────────────
 router.beforeEach((to, from, next) => {
+    // Ensure localStorage has been read before we make auth decisions.
+    // restoreAuth() is idempotent — safe to call multiple times.
     if (!authState.initialized) {
-        return next(false);
+        restoreAuth();
     }
 
-    if (to.meta.requiresAuth && !authState.user) {
-        return next("/login");
+    const user = authState.user;
+
+    // Redirect logged-in users away from guest-only pages
+    if (to.meta.guestOnly && user) {
+        return next({ name: "tasks" });
     }
-    if (to.meta.requiresRole && useTransition.role && to.meta.requiresRole) {
-        return next("/dashboard");
+
+    // Redirect unauthenticated users to login, preserving intended destination
+    if (to.meta.requiresAuth && !user) {
+        return next({ name: "login", query: { redirect: to.fullPath } });
     }
+
+    // Redirect users who lack the required role
+    if (to.meta.requiresRole && (!user || user.role !== to.meta.requiresRole)) {
+        return next({ name: "tasks" });
+    }
+
     next();
 });
 

@@ -6,7 +6,7 @@ import { validateUsers } from "../middleware/validateUsers.js";
 const router = express.Router();
 router.post(
     "/users/async",
-    catchAsync(async (req, res) => {
+    catchAsync(async (req, res, next) => {
         const { name, email } = req.body;
         if (email === "ludwig@dev") {
             throw new AppError("Async Error Test", 500);

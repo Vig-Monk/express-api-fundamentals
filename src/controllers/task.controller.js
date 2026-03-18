@@ -1,17 +1,22 @@
 import Task from "../models/task.model.js";
 import { catchAsync } from "../utils/catchAsync.js";
+import { AppError} from "../utils/appError.js"
 export const createTask = catchAsync(async (req, res, next) => {
-    const task = await Task.create({
-        title: req.body.title,
-        description: req.body.description,
-        user: req.user.id
-    });
+	req.body.user = req.user.id
+    const task = await Task.create(req.body);
     res.status(201).json({
         status: "success",
         data: {
             task
         }
     });
+});
+export const getTask = catchAsync(async (req, res, next) => {
+const filter = { _id: req.params.id };
+if (req.user.role !== 'admin') filter.user = req.user.id;
+const task = await Task.findOne(filter);
+if (!task) return next(new AppError('Task not found', 404));
+res.status(200).json({ status: 'success', data: { task } });
 });
 export const getTasks = catchAsync(async (req, res, next) => {
     const filter = {};
@@ -30,7 +35,7 @@ export const getTasks = catchAsync(async (req, res, next) => {
     const skip = (page - 1) * limit;
     //field limiting
     const fields = req.query.fields
-        ? req.fields.fields.split(",").join(" ")
+        ? req.query.fields.split(",").join(" ")
         : "-__v";
     const tasks = await Task.find(filter)
         .sort(sortBy)
@@ -45,7 +50,47 @@ export const getTasks = catchAsync(async (req, res, next) => {
         }
     });
 });
-const getTaskStats = catchAsync(async (req, res, next) => {
+export const updateTask = catchAsync(async (req, res, next) => {
+
+  const task = await Task.findOneAndUpdate(
+    { _id: req.params.id, user: req.user.id },
+    req.body,
+    {
+      new: true,
+      runValidators: true
+    }
+  );
+
+  if (!task) {
+    return next(new AppError("Task not found", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      task
+    }
+  });
+
+});
+export const deleteTask = catchAsync(async (req, res, next) => {
+
+  const task = await Task.findOneAndDelete({
+    _id: req.params.id,
+    user: req.user.id
+  });
+
+  if (!task) {
+    return next(new AppError("Task not found", 404));
+  }
+
+  res.status(204).json({
+    status: "success",
+    data: null
+  });
+
+});
+export const getTaskStats = catchAsync(async (req, res, next) => {
     const stats = await Task.aggregate([
         {
             $match: {
@@ -61,7 +106,7 @@ const getTaskStats = catchAsync(async (req, res, next) => {
             }
         }
     ]);
-    res.send(200).json({
+    res.status(200).json({
         status: "success",
         data: {
             stats
@@ -102,7 +147,7 @@ export const getTasksPerUser = catchAsync(async (req, res, next) => {
         }
     });
 });
-export const getTasksPerDay = catchAsync(async () => {
+export const getTasksPerDay = catchAsync(async (req,res,next) => {
     const stats = await Task.aggregate([
         {
             $group: {
@@ -126,13 +171,19 @@ export const getTasksPerDay = catchAsync(async () => {
         		_id:0,
         		date:{
         			$dateFromParts:{
-        				year:"_id.year",
-        				month:"_id.month",
-        				day:"_id.day"
+        				year:"$_id.year",
+        				month:"$_id.month",
+        				day:"$_id.day"
         			}
         		},
         		totalTasks:1
         	}
         }
     ]);
+    res.status(200).json({
+    	status:'success',
+    	data:{
+    		stats
+    	}
+    })
 });

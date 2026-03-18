@@ -41,48 +41,186 @@ The content is organized as follows:
 </file_summary>
 
 <directory_structure>
+src/
+  config/
+    config.js
+    database.js
+  controllers/
+    auth.controller.js
+    task.controller.js
+    user.controller.js
+  middleware/
+    auth.middleware.js
+    error.middleware.js
+    restrict.middleware.js
+    sanitize.middleware.js
+    validateUsers.js
+  models/
+    task.model.js
+    user.model.js
+  routes/
+    auth.routes.js
+    health.routes.js
+    task.routes.js
+    test.routes.js
+    users.routes.js
+  utils/
+    appError.js
+    catchAsync.js
+    signToken.js
+  app.js
+  server.js
+vue-client/
+  public/
+    vite.svg
+  src/
+    router/
+      index.js
+    services/
+      api.js
+      auth.service.js
+      task.service.js
+    stores/
+      auth.js
+    views/
+      Admin.vue
+      DashboardView.vue
+      LoginView.vue
+      SignupView.vue
+      TaskDetailsView.vue
+      TasksView.vue
+      UserProfileView.vue
+    App.vue
+    main.js
+    style.css
+  .gitignore
+  index.html
+  package.json
+  README.md
+  vite.config.js
 .gitignore
 package.json
-src/app.js
-src/config/config.js
-src/config/database.js
-src/controllers/auth.controller.js
-src/controllers/user.controller.js
-src/middleware/auth.middleware.js
-src/middleware/error.middleware.js
-src/middleware/restrict.middleware.js
-src/middleware/validateUsers.js
-src/models/user.model.js
-src/routes/auth.routes.js
-src/routes/health.routes.js
-src/routes/test.routes.js
-src/routes/users.routes.js
-src/server.js
-src/utils/appError.js
-src/utils/catchAsync.js
-src/utils/signToken.js
-vue-client/.gitignore
-vue-client/index.html
-vue-client/package.json
-vue-client/public/vite.svg
-vue-client/README.md
-vue-client/src/App.vue
-vue-client/src/main.js
-vue-client/src/router/index.js
-vue-client/src/services/api.js
-vue-client/src/services/auth.service.js
-vue-client/src/stores/auth.js
-vue-client/src/style.css
-vue-client/src/views/Admin.vue
-vue-client/src/views/DashboardView.vue
-vue-client/src/views/LoginView.vue
-vue-client/src/views/SignupView.vue
-vue-client/src/views/UserProfileView.vue
-vue-client/vite.config.js
 </directory_structure>
 
 <files>
 This section contains the contents of the repository's files.
+
+<file path="src/middleware/sanitize.middleware.js">
+export const sanitize = (req, res, next) => {
+    const strip = (obj) => {
+        if (!obj || typeof obj !== "object") return;
+
+        for (const key of Object.keys(obj)) {
+            if (key.startsWith("$") || key.includes(".")) {
+                delete obj[key];
+            } else {
+                strip(obj[key]);
+            }
+        }
+    };
+
+    strip(req.body);
+    strip(req.params);
+    strip(req.query);
+
+    next();
+};
+</file>
+
+<file path="src/middleware/auth.middleware.js">
+import {User} from "../models/user.model.js";
+import { catchAsync } from "../utils/catchAsync.js";
+import { AppError } from "../utils/appError.js";
+import jwt from "jsonwebtoken";
+export const protect = catchAsync(async (req, res, next) => {
+    let token;
+    if (
+        req.headers.authorization &&
+        req.headers.authorization.startsWith("Bearer")
+    ) {
+        token = req.headers.authorization.split(" ")[1];
+    }
+    if (!token) {
+        return next(new AppError("Youre not logged in ", 401));
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id);
+    if (!user){
+    	return next(new AppError('user no longer exists', 401))
+    }
+    req.user = user;
+    next();
+});
+</file>
+
+<file path="src/middleware/restrict.middleware.js">
+import { AppError } from "../utils/appError.js";
+export const restrictTo = function (...role) {
+    return (req, res, next) => {
+        if (!role.includes(req.user.role)) {
+            return next(
+                new AppError(
+                    "You do not have permission to perform this action",
+                    403
+                )
+            );
+        }
+    next();
+    };
+};
+</file>
+
+<file path="src/models/task.model.js">
+import mongoose from "mongoose";
+const taskSchema = new mongoose.Schema(
+    {
+        title: {
+            type: String,
+            required: [true, "A task must have a tittle"],
+            trim: true
+        },
+        description: {
+            type: String,
+            trim: true
+        },
+        completed: {
+            type: Boolean,
+            default: false
+        },
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: [true, "A task must belong to a user"]
+        }
+    },
+    {
+        timestamps: true
+    }
+);
+const Task = mongoose.model("Task", taskSchema);
+export default Task;
+</file>
+
+<file path="src/routes/auth.routes.js">
+import express from "express";
+import {signup, login} from '../controllers/auth.controller.js'
+const router = express.Router();
+router.post("/signup", signup);
+router.post('/login', login)
+export default router;
+</file>
+
+<file path="src/utils/catchAsync.js">
+export const catchAsync = function (fn) {
+    return (req, res, next) => {
+        fn(req, res, next).catch(next);
+    };
+};
+</file>
+
+<file path="vue-client/public/vite.svg">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="31.88" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 257"><defs><linearGradient id="IconifyId1813088fe1fbc01fb466" x1="-.828%" x2="57.636%" y1="7.652%" y2="78.411%"><stop offset="0%" stop-color="#41D1FF"></stop><stop offset="100%" stop-color="#BD34FE"></stop></linearGradient><linearGradient id="IconifyId1813088fe1fbc01fb467" x1="43.376%" x2="50.316%" y1="2.242%" y2="89.03%"><stop offset="0%" stop-color="#FFEA83"></stop><stop offset="8.333%" stop-color="#FFDD35"></stop><stop offset="100%" stop-color="#FFA800"></stop></linearGradient></defs><path fill="url(#IconifyId1813088fe1fbc01fb466)" d="M255.153 37.938L134.897 252.976c-2.483 4.44-8.862 4.466-11.382.048L.875 37.958c-2.746-4.814 1.371-10.646 6.827-9.67l120.385 21.517a6.537 6.537 0 0 0 2.322-.004l117.867-21.483c5.438-.991 9.574 4.796 6.877 9.62Z"></path><path fill="url(#IconifyId1813088fe1fbc01fb467)" d="M185.432.063L96.44 17.501a3.268 3.268 0 0 0-2.634 3.014l-5.474 92.456a3.268 3.268 0 0 0 3.997 3.378l24.777-5.718c2.318-.535 4.413 1.507 3.936 3.838l-7.361 36.047c-.495 2.426 1.782 4.5 4.151 3.78l15.304-4.649c2.372-.72 4.652 1.36 4.15 3.788l-11.698 56.621c-.732 3.542 3.979 5.473 5.943 2.437l1.313-2.028l72.516-144.72c1.215-2.423-.88-5.186-3.54-4.672l-25.505 4.922c-2.396.462-4.435-1.77-3.759-4.114l16.646-57.705c.677-2.35-1.37-4.583-3.769-4.113Z"></path></svg>
+</file>
 
 <file path="vue-client/src/services/api.js">
 import axios from 'axios'
@@ -114,115 +252,830 @@ api.interceptors.response.use(
 export default api
 </file>
 
-<file path=".gitignore">
-node_modules
-.env
-</file>
+<file path="vue-client/src/services/task.service.js">
+import api from "./api.js";
 
-<file path="src/middleware/auth.middleware.js">
-import {User} from "../models/user.model.js";
-import { catchAsync } from "../utils/catchAsync.js";
-import { AppError } from "../utils/appError.js";
-import jwt from "jsonwebtoken";
-export const protect = catchAsync(async (req, res, next) => {
-    let token;
-    if (
-        req.headers.authorization &&
-        req.headers.authorization.startsWith("Bearer")
-    ) {
-        token = req.headers.authorization.split(" ")[1];
+const taskService = {
+    getMyTasks() {
+        return api.get("/api/v1/tasks");
+    },
+    getTask(taskId){
+    	return api.get(`/api/v1/tasks/${taskId}`)
     }
-    if (!token) {
-    	console.log(req.headers.authorization)
-        return next(new AppError("Youre not logged in ", 401));
-    }
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id);
-    if (!user){
-    	return next(new AppError('user no longer exists', 401))
-    }
-    req.user = user;
-    next();
-});
-</file>
-
-<file path="src/middleware/restrict.middleware.js">
-import { AppError} from "../utils/appError.js"
-export const restrictTo = function(...role){
-	return (req,res,next)=> {
-		if (!role.includes(req.user.role)){
-			next(new AppError("You do not have permission to perform this action",403))
-		}
-		next()
-	}
-}
-</file>
-
-<file path="src/routes/auth.routes.js">
-import express from "express";
-import {signup, login} from '../controllers/auth.controller.js'
-const router = express.Router();
-router.post("/signup", signup);
-router.post('/login', login)
-export default router;
-</file>
-
-<file path="src/utils/catchAsync.js">
-export const catchAsync = function (fn) {
-    return (req, res, next) => {
-        fn(req, res, next).catch(next);
-    };
+    createTask(taskData) {
+        return api.post("/api/v1/tasks", taskData);
+    },
+    updateTask(taskId, taskData) {
+        return api.patch(`/api/v1/tasks/${taskId}`, taskData); // ← was missing taskData arg
+    },
+    deleteTask(taskId) {
+        return api.delete(`/api/v1/tasks/${taskId}`); // ← was tadkId (typo)
+    },
 };
+
+export default taskService;
 </file>
 
-<file path="vue-client/index.html">
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>vue-client</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
-</html>
+<file path="vue-client/src/views/TaskDetailsView.vue">
+<script setup>
+import { ref, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import taskService from '../services/task.service.js';
+const route = useRoute();
+const router = useRouter();
+const task = ref(null);
+const loading = ref(true);
+const error = ref('');
+const editing = ref(false);
+const editTitle = ref('');
+const editDesc = ref('');
+onMounted(async () => {
+try {
+const res = await taskService.getTask(route.params.id);
+task.value = res.data.data.task;
+} catch { error.value = 'Task not found.'; }
+finally { loading.value = false; }
+});
+const startEdit = () => {
+editTitle.value = task.value.title;
+editDesc.value = task.value.description ?? '';
+editing.value = true;
+};
+const saveEdit = async () => {
+await taskService.updateTask(task.value._id, {
+title: editTitle.value.trim(),
+description: editDesc.value.trim()
+});
+task.value.title = editTitle.value.trim();
+task.value.description = editDesc.value.trim();
+editing.value = false;
+};
+const deleteTask = async () => {
+if (!confirm('Delete this task?')) return;
+await taskService.deleteTask(task.value._id);
+router.push('/tasks');
+};
+</script>
+<template>
+	<h1>task details</h1>
+</template>
 </file>
 
-<file path="vue-client/package.json">
-{
-  "name": "vue-client",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "vue": "^3.5.24",
-    "vue-router": "^4.6.4"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-vue": "^6.0.1",
-    "vite": "^7.2.4"
-  }
+<file path="vue-client/src/views/TasksView.vue">
+<script setup>
+import { ref, onMounted, computed } from "vue";
+import taskService from "../services/task.service.js";
+
+// ── State ──────────────────────────────────────────────────────────────────────
+const tasks      = ref([]);
+const loading    = ref(true);
+const error      = ref("");
+const submitting = ref(false);
+
+// ── Create ─────────────────────────────────────────────────────────────────────
+const newTaskTitle = ref("");
+
+// ── Edit ───────────────────────────────────────────────────────────────────────
+const editingTaskId   = ref(null);
+const editTitle       = ref("");
+const editDescription = ref("");
+const editSaving      = ref(false);
+const editError       = ref("");
+
+// ── Fetch ──────────────────────────────────────────────────────────────────────
+const fetchTasks = async () => {
+    loading.value = true;
+    error.value = "";
+    try {
+        const res = await taskService.getMyTasks();
+        tasks.value = res.data.data.tasks;
+    } catch {
+        error.value = "Failed to load tasks.";
+    } finally {
+        loading.value = false;
+    }
+};
+
+onMounted(fetchTasks);
+
+// ── Create task ────────────────────────────────────────────────────────────────
+const createTask = async () => {
+    if (!newTaskTitle.value.trim()) return;
+    submitting.value = true;
+    error.value = "";
+    try {
+        await taskService.createTask({ title: newTaskTitle.value.trim() });
+        newTaskTitle.value = "";
+        await fetchTasks();
+    } catch {
+        error.value = "Failed to create task.";
+    } finally {
+        submitting.value = false;
+    }
+};
+
+// ── Edit handlers ──────────────────────────────────────────────────────────────
+const startEdit = (task) => {
+    editingTaskId.value   = task._id;
+    editTitle.value       = task.title;
+    editDescription.value = task.description ?? "";
+    editError.value       = "";
+};
+
+const cancelEdit = () => {
+    editingTaskId.value   = null;
+    editTitle.value       = "";
+    editDescription.value = "";
+    editError.value       = "";
+};
+
+const saveEdit = async () => {
+    if (!editTitle.value.trim()) {
+        editError.value = "Title cannot be empty.";
+        return;
+    }
+    editSaving.value = true;
+    editError.value  = "";
+    try {
+        await taskService.updateTask(editingTaskId.value, {
+            title:       editTitle.value.trim(),
+            description: editDescription.value.trim(),
+        });
+        const task = tasks.value.find(t => t._id === editingTaskId.value);
+        if (task) {
+            task.title       = editTitle.value.trim();
+            task.description = editDescription.value.trim();
+        }
+        cancelEdit();
+    } catch {
+        editError.value = "Failed to save changes.";
+    } finally {
+        editSaving.value = false;
+    }
+};
+
+// ── Toggle complete ────────────────────────────────────────────────────────────
+const toggleComplete = async (task) => {
+    const original = task.completed;
+    task.completed = !task.completed;
+    try {
+        await taskService.updateTask(task._id, { completed: task.completed });
+    } catch {
+        task.completed = original;
+    }
+};
+
+// ── Delete ─────────────────────────────────────────────────────────────────────
+const deleteTask = async (taskId) => {
+    if (!confirm("Delete this task?")) return;
+    try {
+        await taskService.deleteTask(taskId);
+        tasks.value = tasks.value.filter(t => t._id !== taskId);
+    } catch {
+        error.value = "Failed to delete task.";
+    }
+};
+
+// ── Stats ──────────────────────────────────────────────────────────────────────
+const totalCount     = computed(() => tasks.value.length);
+const completedCount = computed(() => tasks.value.filter(t => t.completed).length);
+const pendingCount   = computed(() => tasks.value.filter(t => !t.completed).length);
+const progressPct    = computed(() =>
+    totalCount.value === 0 ? 0 : Math.round((completedCount.value / totalCount.value) * 100)
+);
+</script>
+
+<template>
+    <div class="page">
+
+        <!-- ── Page header ──────────────────────────────────────────────────── -->
+        <header class="page-header">
+            <div class="page-header__left">
+                <span class="page-eyebrow">Workspace</span>
+                <h1 class="page-title">My Tasks</h1>
+            </div>
+            <div class="page-header__dot" />
+        </header>
+
+        <!-- ── Bento grid ───────────────────────────────────────────────────── -->
+        <div class="bento">
+
+            <!-- Tile: Total -->
+            <div class="bento-tile bento-tile--stat" style="animation-delay:.05s">
+                <span class="tile-label">Total</span>
+                <span class="tile-number">{{ totalCount }}</span>
+                <span class="tile-sub">tasks created</span>
+            </div>
+
+            <!-- Tile: Completed -->
+            <div class="bento-tile bento-tile--stat bento-tile--amber" style="animation-delay:.1s">
+                <span class="tile-label">Done</span>
+                <span class="tile-number">{{ completedCount }}</span>
+                <span class="tile-sub">completed</span>
+            </div>
+
+            <!-- Tile: Pending -->
+            <div class="bento-tile bento-tile--stat" style="animation-delay:.15s">
+                <span class="tile-label">Pending</span>
+                <span class="tile-number">{{ pendingCount }}</span>
+                <span class="tile-sub">remaining</span>
+            </div>
+
+            <!-- Tile: Progress -->
+            <div class="bento-tile bento-tile--progress" style="animation-delay:.2s">
+                <div class="progress-header">
+                    <span class="tile-label">Progress</span>
+                    <span class="progress-pct">{{ progressPct }}%</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" :style="{ width: progressPct + '%' }" />
+                </div>
+                <span class="tile-sub">{{ completedCount }} of {{ totalCount }} done</span>
+            </div>
+
+            <!-- Tile: Add task -->
+            <div class="bento-tile bento-tile--create" style="animation-delay:.25s">
+                <span class="tile-label">New task</span>
+                <form class="create-form" @submit.prevent="createTask">
+                    <input
+                        v-model="newTaskTitle"
+                        class="create-input"
+                        placeholder="What needs doing?"
+                        :disabled="submitting"
+                        maxlength="200"
+                        autocomplete="off"
+                    />
+                    <button class="create-btn" type="submit" :disabled="submitting || !newTaskTitle.trim()">
+                        <span v-if="submitting" class="spinner" />
+                        <svg v-else width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </button>
+                </form>
+                <p v-if="error" class="create-error">{{ error }}</p>
+            </div>
+
+            <!-- Tile: Task list -->
+            <div class="bento-tile bento-tile--list" style="animation-delay:.3s">
+                <span class="tile-label">All tasks</span>
+
+                <!-- Loading skeletons -->
+                <div v-if="loading" class="skeleton-list">
+                    <div v-for="n in 5" :key="n" class="skeleton-row" :style="`animation-delay:${n * 0.07}s`" />
+                </div>
+
+                <!-- Empty state -->
+                <div v-else-if="tasks.length === 0" class="empty-state">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12l3 3 5-5"/></svg>
+                    <p>No tasks yet — add one above</p>
+                </div>
+
+                <!-- Task list -->
+                <ul v-else class="task-list">
+                    <li
+                        v-for="(task, i) in tasks"
+                        :key="task._id"
+                        class="task-item"
+                        :class="{ 'task-item--done': task.completed }"
+                        :style="`animation-delay: ${0.3 + i * 0.055}s`"
+                    >
+                        <!-- Read view -->
+                        <template v-if="editingTaskId !== task._id">
+                            <button
+                                class="check-btn"
+                                :class="{ 'check-btn--checked': task.completed }"
+                                @click="toggleComplete(task)"
+                                :aria-label="task.completed ? 'Mark incomplete' : 'Mark complete'"
+                            >
+                                <svg v-if="task.completed" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+                            </button>
+
+                            <div class="task-content">
+                                <span class="task-title">{{ task.title }}</span>
+                                <span v-if="task.description" class="task-desc">{{ task.description }}</span>
+                            </div>
+
+                            <div class="task-actions">
+                                <button class="action-btn" @click="startEdit(task)" aria-label="Edit">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                </button>
+                                <button class="action-btn action-btn--danger" @click="deleteTask(task._id)" aria-label="Delete">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                                </button>
+                            </div>
+                        </template>
+
+                        <!-- Edit view -->
+                        <template v-else>
+                            <div class="edit-form">
+                                <input
+                                    v-model="editTitle"
+                                    class="edit-input"
+                                    :class="{ 'edit-input--error': editError }"
+                                    placeholder="Task title"
+                                    maxlength="200"
+                                    autocomplete="off"
+                                    @keydown.enter.prevent="saveEdit"
+                                    @keydown.escape="cancelEdit"
+                                />
+                                <textarea
+                                    v-model="editDescription"
+                                    class="edit-textarea"
+                                    placeholder="Description (optional)"
+                                    rows="2"
+                                    maxlength="2000"
+                                />
+                                <p v-if="editError" class="edit-error-msg">{{ editError }}</p>
+                                <div class="edit-actions">
+                                    <button class="edit-btn edit-btn--cancel" type="button" @click="cancelEdit" :disabled="editSaving">Cancel</button>
+                                    <button class="edit-btn edit-btn--save" type="button" @click="saveEdit" :disabled="editSaving">
+                                        <span v-if="editSaving" class="spinner spinner--dark" />
+                                        {{ editSaving ? "Saving…" : "Save" }}
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</template>
+
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Manrope:wght@400;500;600&display=swap');
+
+/* ── Tokens ───────────────────────────────────────────────────────────────── */
+.page {
+    --bg:           #080c18;
+    --surface:      #111827;
+    --surface-2:    #1a2235;
+    --border:       rgba(255,255,255,.07);
+    --border-hover: rgba(245,158,11,.28);
+    --amber:        #f59e0b;
+    --amber-glow:   rgba(245,158,11,.06);
+    --text-1:       #eef1f8;
+    --text-2:       #7c8aa0;
+    --text-3:       #404e63;
+    --danger:       #ef4444;
+    --r-tile:       18px;
+    --r-sm:         10px;
 }
-</file>
 
-<file path="vue-client/public/vite.svg">
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="31.88" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 257"><defs><linearGradient id="IconifyId1813088fe1fbc01fb466" x1="-.828%" x2="57.636%" y1="7.652%" y2="78.411%"><stop offset="0%" stop-color="#41D1FF"></stop><stop offset="100%" stop-color="#BD34FE"></stop></linearGradient><linearGradient id="IconifyId1813088fe1fbc01fb467" x1="43.376%" x2="50.316%" y1="2.242%" y2="89.03%"><stop offset="0%" stop-color="#FFEA83"></stop><stop offset="8.333%" stop-color="#FFDD35"></stop><stop offset="100%" stop-color="#FFA800"></stop></linearGradient></defs><path fill="url(#IconifyId1813088fe1fbc01fb466)" d="M255.153 37.938L134.897 252.976c-2.483 4.44-8.862 4.466-11.382.048L.875 37.958c-2.746-4.814 1.371-10.646 6.827-9.67l120.385 21.517a6.537 6.537 0 0 0 2.322-.004l117.867-21.483c5.438-.991 9.574 4.796 6.877 9.62Z"></path><path fill="url(#IconifyId1813088fe1fbc01fb467)" d="M185.432.063L96.44 17.501a3.268 3.268 0 0 0-2.634 3.014l-5.474 92.456a3.268 3.268 0 0 0 3.997 3.378l24.777-5.718c2.318-.535 4.413 1.507 3.936 3.838l-7.361 36.047c-.495 2.426 1.782 4.5 4.151 3.78l15.304-4.649c2.372-.72 4.652 1.36 4.15 3.788l-11.698 56.621c-.732 3.542 3.979 5.473 5.943 2.437l1.313-2.028l72.516-144.72c1.215-2.423-.88-5.186-3.54-4.672l-25.505 4.922c-2.396.462-4.435-1.77-3.759-4.114l16.646-57.705c.677-2.35-1.37-4.583-3.769-4.113Z"></path></svg>
-</file>
+/* ── Page ─────────────────────────────────────────────────────────────────── */
+.page {
+    min-height: 100vh;
+    background: var(--bg);
+    background-image:
+        radial-gradient(ellipse 70% 50% at 75% -5%, rgba(245,158,11,.08) 0%, transparent 65%),
+        radial-gradient(ellipse 45% 35% at 5% 90%, rgba(99,102,241,.05) 0%, transparent 60%);
+    padding: 48px 32px 80px;
+    font-family: 'Manrope', system-ui, sans-serif;
+    color: var(--text-1);
+    box-sizing: border-box;
+}
 
-<file path="vue-client/README.md">
-# Vue 3 + Vite
+/* ── Page header ──────────────────────────────────────────────────────────── */
+.page-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 36px;
+    animation: fadeUp .5s ease both;
+}
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+.page-header__left { display: flex; flex-direction: column; gap: 4px; }
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+.page-eyebrow {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--amber);
+}
+
+.page-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--text-1);
+    margin: 0;
+    line-height: 1;
+    letter-spacing: -.025em;
+}
+
+.page-header__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--amber);
+    box-shadow: 0 0 18px var(--amber);
+    animation: pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: .4; transform: scale(.65); }
+}
+
+/* ── Bento grid ───────────────────────────────────────────────────────────── */
+.bento {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+/* ── Tile base ────────────────────────────────────────────────────────────── */
+.bento-tile {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-tile);
+    padding: 22px 24px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color .22s, box-shadow .22s, transform .22s;
+    animation: fadeUp .55s ease both;
+}
+
+.bento-tile::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(ellipse 80% 60% at 0% 0%, var(--amber-glow), transparent 70%);
+    opacity: 0;
+    transition: opacity .3s;
+    pointer-events: none;
+}
+
+.bento-tile:hover {
+    border-color: var(--border-hover);
+    box-shadow: 0 0 0 1px rgba(245,158,11,.08), 0 12px 40px rgba(0,0,0,.45);
+    transform: translateY(-3px);
+}
+
+.bento-tile:hover::after { opacity: 1; }
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Stat tiles ───────────────────────────────────────────────────────────── */
+.bento-tile--stat {
+    grid-column: span 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.bento-tile--amber {
+    background: linear-gradient(145deg, #1c1508 0%, #221b09 100%);
+    border-color: rgba(245,158,11,.18);
+}
+.bento-tile--amber .tile-number { color: var(--amber); }
+
+.tile-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--text-2);
+    margin-bottom: 2px;
+}
+
+.tile-number {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: var(--text-1);
+    line-height: 1;
+    letter-spacing: -.035em;
+}
+
+.tile-sub {
+    font-size: 0.74rem;
+    color: var(--text-3);
+    margin-top: 2px;
+}
+
+/* ── Progress tile ────────────────────────────────────────────────────────── */
+.bento-tile--progress {
+    grid-column: span 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.progress-pct {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--amber);
+}
+
+.progress-track {
+    height: 5px;
+    background: var(--surface-2);
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #d97706, var(--amber), #fbbf24);
+    border-radius: 99px;
+    transition: width .7s cubic-bezier(.4,0,.2,1);
+    box-shadow: 0 0 12px rgba(245,158,11,.6);
+}
+
+/* ── Create tile ──────────────────────────────────────────────────────────── */
+.bento-tile--create {
+    grid-column: span 4;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.create-form { display: flex; gap: 10px; }
+
+.create-input {
+    flex: 1;
+    padding: 12px 16px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    font-size: 0.9rem;
+    font-family: 'Manrope', sans-serif;
+    color: var(--text-1);
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+}
+.create-input::placeholder { color: var(--text-3); }
+.create-input:focus {
+    border-color: rgba(245,158,11,.4);
+    box-shadow: 0 0 0 3px rgba(245,158,11,.07);
+}
+.create-input:disabled { opacity: .4; cursor: not-allowed; }
+
+.create-btn {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    border-radius: var(--r-sm);
+    border: none;
+    background: var(--amber);
+    color: #080c18;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    transition: background .15s, box-shadow .15s, transform .1s;
+}
+.create-btn:hover:not(:disabled) {
+    background: #fbbf24;
+    box-shadow: 0 0 24px rgba(245,158,11,.45);
+}
+.create-btn:active:not(:disabled) { transform: scale(.93); }
+.create-btn:disabled { opacity: .3; cursor: not-allowed; }
+
+.create-error { font-size: 0.78rem; color: var(--danger); margin: 0; }
+
+/* ── List tile ────────────────────────────────────────────────────────────── */
+.bento-tile--list {
+    grid-column: span 4;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* ── Skeletons ────────────────────────────────────────────────────────────── */
+.skeleton-list { display: flex; flex-direction: column; gap: 8px; }
+
+.skeleton-row {
+    height: 52px;
+    border-radius: var(--r-sm);
+    background: linear-gradient(90deg, var(--surface-2) 25%, #1e2b40 50%, var(--surface-2) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.6s infinite;
+    opacity: 0;
+    animation: shimmer 1.6s infinite, fadeUp .4s ease both;
+}
+
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+/* ── Empty state ──────────────────────────────────────────────────────────── */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 48px 0;
+    color: var(--text-3);
+}
+.empty-state p { font-size: 0.85rem; margin: 0; }
+
+/* ── Task list ────────────────────────────────────────────────────────────── */
+.task-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.task-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 13px 15px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    animation: fadeUp .4s ease both;
+    transition: border-color .15s, background .15s;
+}
+.task-item:hover {
+    border-color: rgba(245,158,11,.15);
+    background: #1c2540;
+}
+.task-item--done { opacity: .45; }
+
+/* ── Checkbox ─────────────────────────────────────────────────────────────── */
+.check-btn {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    border: 1.5px solid var(--text-3);
+    background: transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color .15s, background .15s, box-shadow .15s;
+    color: #080c18;
+}
+.check-btn:hover { border-color: var(--amber); }
+.check-btn--checked {
+    background: var(--amber);
+    border-color: var(--amber);
+    box-shadow: 0 0 12px rgba(245,158,11,.4);
+}
+
+/* ── Task content ─────────────────────────────────────────────────────────── */
+.task-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.task-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-1);
+    word-break: break-word;
+}
+.task-item--done .task-title { text-decoration: line-through; color: var(--text-3); }
+
+.task-desc { font-size: 0.78rem; color: var(--text-2); }
+
+/* ── Row action buttons ───────────────────────────────────────────────────── */
+.task-actions {
+    display: flex;
+    gap: 2px;
+    opacity: 0;
+    transition: opacity .15s;
+    flex-shrink: 0;
+}
+.task-item:hover .task-actions { opacity: 1; }
+
+.action-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    border: none;
+    background: none;
+    color: var(--text-3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .12s, color .12s;
+}
+.action-btn:hover { background: rgba(255,255,255,.05); color: var(--text-1); }
+.action-btn--danger:hover { background: rgba(239,68,68,.1); color: var(--danger); }
+
+/* ── Inline edit form ─────────────────────────────────────────────────────── */
+.edit-form {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.edit-input,
+.edit-textarea {
+    padding: 9px 12px;
+    background: var(--surface);
+    border: 1px solid rgba(245,158,11,.22);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-family: 'Manrope', sans-serif;
+    color: var(--text-1);
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color .15s, box-shadow .15s;
+}
+.edit-input:focus,
+.edit-textarea:focus {
+    border-color: rgba(245,158,11,.5);
+    box-shadow: 0 0 0 3px rgba(245,158,11,.07);
+}
+.edit-input--error { border-color: var(--danger) !important; }
+.edit-textarea { resize: vertical; min-height: 54px; }
+
+.edit-error-msg { font-size: 0.78rem; color: var(--danger); margin: 0; }
+
+.edit-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.edit-btn {
+    padding: 7px 16px;
+    border-radius: 7px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: 'Manrope', sans-serif;
+    cursor: pointer;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all .15s;
+}
+.edit-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+.edit-btn--cancel {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-2);
+}
+.edit-btn--cancel:hover:not(:disabled) { background: rgba(255,255,255,.04); color: var(--text-1); }
+
+.edit-btn--save { background: var(--amber); color: #080c18; }
+.edit-btn--save:hover:not(:disabled) {
+    background: #fbbf24;
+    box-shadow: 0 0 18px rgba(245,158,11,.35);
+}
+
+/* ── Spinner ──────────────────────────────────────────────────────────────── */
+.spinner {
+    width: 12px;
+    height: 12px;
+    border: 2px solid rgba(255,255,255,.25);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .6s linear infinite;
+    flex-shrink: 0;
+}
+.spinner--dark {
+    border-color: rgba(8,12,24,.2);
+    border-top-color: #080c18;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .page { padding: 28px 16px 60px; }
+    .page-title { font-size: 2rem; }
+    .bento { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .bento-tile--stat   { grid-column: span 1; }
+    .bento-tile--progress { grid-column: span 1; }
+    .bento-tile--create,
+    .bento-tile--list   { grid-column: span 2; }
+}
+
+@media (max-width: 480px) {
+    .bento { grid-template-columns: 1fr; }
+    .bento-tile { grid-column: span 1 !important; }
+    .tile-number { font-size: 2.2rem; }
+}
+</style>
 </file>
 
 <file path="vue-client/src/style.css">
@@ -307,8 +1160,247 @@ button:focus-visible {
 }
 </file>
 
-<file path="vue-client/src/views/Admin.vue">
+<file path="vue-client/index.html">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>vue-client</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
+</file>
 
+<file path="vue-client/package.json">
+{
+  "name": "vue-client",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.5.24",
+    "vue-router": "^4.6.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.1",
+    "vite": "^7.2.4"
+  }
+}
+</file>
+
+<file path="vue-client/README.md">
+# Vue 3 + Vite
+
+This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+
+Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+</file>
+
+<file path=".gitignore">
+node_modules
+.env
+</file>
+
+<file path="src/controllers/task.controller.js">
+import Task from "../models/task.model.js";
+import { catchAsync } from "../utils/catchAsync.js";
+import { AppError} from "../utils/appError.js"
+export const createTask = catchAsync(async (req, res, next) => {
+	req.body.user = req.user.id
+    const task = await Task.create(req.body);
+    res.status(201).json({
+        status: "success",
+        data: {
+            task
+        }
+    });
+});
+export const getTask = catchAsync(async (req, res, next) => {
+const filter = { _id: req.params.id };
+if (req.user.role !== 'admin') filter.user = req.user.id;
+const task = await Task.findOne(filter);
+if (!task) return next(new AppError('Task not found', 404));
+res.status(200).json({ status: 'success', data: { task } });
+});
+export const getTasks = catchAsync(async (req, res, next) => {
+    const filter = {};
+    if (req.user.role !== "admin") {
+        filter.user = req.user.id;
+    }
+    //filtering
+    if (req.query.completed !== undefined) {
+        filter.completed = req.query.completed === "true";
+    }
+    //sorting
+    const sortBy = req.query.sort || "-createdAt";
+    //pagination
+    const page = req.query.page * 1 || 1;
+    const limit = req.query.limit * 1 || 10;
+    const skip = (page - 1) * limit;
+    //field limiting
+    const fields = req.query.fields
+        ? req.query.fields.split(",").join(" ")
+        : "-__v";
+    const tasks = await Task.find(filter)
+        .sort(sortBy)
+        .skip(skip)
+        .limit(limit)
+        .select(fields);
+    res.status(200).json({
+        status: "success",
+        results: tasks.length,
+        data: {
+            tasks
+        }
+    });
+});
+export const updateTask = catchAsync(async (req, res, next) => {
+
+  const task = await Task.findOneAndUpdate(
+    { _id: req.params.id, user: req.user.id },
+    req.body,
+    {
+      new: true,
+      runValidators: true
+    }
+  );
+
+  if (!task) {
+    return next(new AppError("Task not found", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      task
+    }
+  });
+
+});
+export const deleteTask = catchAsync(async (req, res, next) => {
+
+  const task = await Task.findOneAndDelete({
+    _id: req.params.id,
+    user: req.user.id
+  });
+
+  if (!task) {
+    return next(new AppError("Task not found", 404));
+  }
+
+  res.status(204).json({
+    status: "success",
+    data: null
+  });
+
+});
+export const getTaskStats = catchAsync(async (req, res, next) => {
+    const stats = await Task.aggregate([
+        {
+            $match: {
+                createdAt: {
+                    $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+                }
+            }
+        },
+        {
+            $group: {
+                _id: "$completed",
+                totalTasks: { $sum: 1 }
+            }
+        }
+    ]);
+    res.status(200).json({
+        status: "success",
+        data: {
+            stats
+        }
+    });
+});
+export const getTasksPerUser = catchAsync(async (req, res, next) => {
+    const stats = await Task.aggregate([
+        {
+            $group: {
+                _id: "$user",
+                totalTasks: { $sum: 1 }
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "_id",
+                foreignField: "_id",
+                as: "user"
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                userId: "$_id",
+                totalTasks: 1,
+                user: {
+                    $arrayElemAt: ["$user", 0]
+                }
+            }
+        }
+    ]);
+    res.status(200).json({
+        status: "success",
+        data: {
+            stats
+        }
+    });
+});
+export const getTasksPerDay = catchAsync(async (req,res,next) => {
+    const stats = await Task.aggregate([
+        {
+            $group: {
+                _id: {
+                    year: { $year: "$createdAt" },
+                    month: { $month: "$createdAt" },
+                    day: { $dayOfMonth: "$createdAt" }
+                },
+                totalTasks: { $sum: 1 }
+            }
+        },
+        {
+            $sort: {
+                "_id.year": 1,
+                "_id.month": 1,
+                "_id.day": 1
+            }
+        },
+        {
+        	$project:{
+        		_id:0,
+        		date:{
+        			$dateFromParts:{
+        				year:"$_id.year",
+        				month:"$_id.month",
+        				day:"$_id.day"
+        			}
+        		},
+        		totalTasks:1
+        	}
+        }
+    ]);
+    res.status(200).json({
+    	status:'success',
+    	data:{
+    		stats
+    	}
+    })
+});
 </file>
 
 <file path="src/controllers/user.controller.js">
@@ -319,7 +1411,7 @@ export const getUser = catchAsync(async (req, res, next) => {
     const requestedUserId = req.params.id;
     const requestedUser = req.user;
     const user = await User.findById(requestedUserId);
-    if (!requestedUserId) {
+    if (!user) {
         return next(new AppError("User does not exist", 401));
     }
     if (
@@ -333,7 +1425,7 @@ export const getUser = catchAsync(async (req, res, next) => {
             )
         );
     }
-    res.status(201).json({
+    res.status(200).json({
         status: "success",
         data: {
             user
@@ -364,9 +1456,48 @@ import express from "express";
 import { AppError } from "../utils/appError.js";
 const router = express.Router();
 router.get("/health", (req, res) => {
-    throw new AppError("Health check Failed", 404);
+    res.status(200).json({
+    	status:'ok',
+    	uptime:process.uptime(),
+    	timestamp:new Date().toISOstring()
+    })
 });
 
+export default router;
+</file>
+
+<file path="src/routes/task.routes.js">
+import express from "express";
+import { protect } from "../middleware/auth.middleware.js";
+import {
+    createTask,
+    deleteTask,
+    updateTask,
+    getTasks,
+    getTask,
+    getTaskStats,
+    getTasksPerUser,
+    getTasksPerDay
+} from "../controllers/task.controller.js";
+import { restrictTo } from "../middleware/restrict.middleware.js";
+
+const router = express.Router();
+router.use(protect);
+router.get("/stats", protect, restrictTo("admin"), getTaskStats);
+router.get(
+    "/stats/tasks-per-user",
+    protect,
+    restrictTo("admin"),
+    getTasksPerUser
+);
+router.get(
+    "/stats/tasks-per-day",
+    protect,
+    restrictTo("admin"),
+    getTasksPerDay
+);
+router.route("/").post(createTask).get(getTasks);
+router.route('/:id').get(getTask).patch(updateTask).delete(deleteTask)
 export default router;
 </file>
 
@@ -395,7 +1526,7 @@ import { validateUsers } from "../middleware/validateUsers.js";
 const router = express.Router();
 router.post(
     "/users/async",
-    catchAsync(async (req, res) => {
+    catchAsync(async (req, res, next) => {
         const { name, email } = req.body;
         if (email === "ludwig@dev") {
             throw new AppError("Async Error Test", 500);
@@ -435,11 +1566,42 @@ export class AppError extends Error {
 import jwt from "jsonwebtoken";
 import { config } from "../config/config.js";
 export const signToken = id => {
-    console.log(config.jwtExpiresIn);
-    return jwt.sign({ id }, config.jwtsecret, {
+    return jwt.sign({ id }, config.jwtSecret, {
         expiresIn: config.jwtExpiresIn
     });
 };
+</file>
+
+<file path="vue-client/src/views/Admin.vue">
+
+</file>
+
+<file path="vue-client/src/views/UserProfileView.vue">
+<script setup>
+import { ref, onMounted, computed } from 'vue';
+import { useRoute } from 'vue-router';
+import { authState } from '../stores/auth.js';
+import api from '../services/api.js';
+const route = useRoute();
+const user = ref(null);
+const isOwner = computed(() =>
+authState.user?._id === route.params.id ||
+authState.user?.id === route.params.id
+);
+onMounted(async () => {
+const res = await api.get(`/api/v1/test/user/${route.params.id}`);
+user.value = res.data.data.user;
+});
+</script>
+<template>
+<div v-if='user'>
+<h2>{{ user.name }}</h2>
+<p>{{ user.email }}</p>
+<p>Role: {{ user.role }}</p>
+<p>Member since: {{ new Date(user.createdAt).toLocaleDateString() }}</p>
+<button v-if='isOwner'>Edit Profile</button>
+</div>
+</template>
 </file>
 
 <file path="vue-client/.gitignore">
@@ -469,53 +1631,6 @@ dist-ssr
 *.sw?
 </file>
 
-<file path="vue-client/src/services/auth.service.js">
-import api from "./api.js"
-const API_URL = "auth"
-export const login = async (payload) => {
-	const res = await api.post(`/auth/login`, payload)
-	return res.data
-}
-export const signup = async (payload) => {
-	const res = await api.post(`/auth/signup`, payload)
-	return res.data
-}
-</file>
-
-<file path="vue-client/src/views/DashboardView.vue">
-<script setup>
-import { authState } from "../stores/auth.js";
-</script>
-<template>
-    <h2>Dashboard</h2>
-    <h2>Hi, {[useState.user?.name}}</h2>
-    <div v-if="authState.user?.role === 'admin'">
-    	Admin panel 
-    </div>
-</template>
-<style></style>
-</file>
-
-<file path="vue-client/src/views/UserProfileView.vue">
-<script setup>
-import { computed } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import { authState } from "../stores/auth.js";
-const route = useRoute();
-const requestedId = route.params.id;
-const isOwner = authState.user && requestedId === authState.user.id;
-</script>
-<template>
-    <h2>
-        user profile
-    </h2>
-    <button v-if="isOwner">
-    	Edit profile 
-    </button>
-</template>
-<style></style>
-</file>
-
 <file path="vue-client/vite.config.js">
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
@@ -543,8 +1658,9 @@ export const config = {
     env: process.env.NODE_ENV,
     port: process.env.PORT || 3000,
     mongoUri: process.env.MONGO_URI,
-    jwtsecret: process.env.JWT_SECRET,
+    jwtSecret: process.env.JWT_SECRET,
     jwtExpiresIn: process.env.JWT_EXPIRES_IN,
+    clientUrl: process.env.CLIENT_URL
 }
 </file>
 
@@ -554,7 +1670,6 @@ import { config } from "./config.js";
 export const connectDB = async () => {
     try {
         await mongoose.connect(config.mongoUri);
-        console.log(config.jwtExpiresIn)
         console.log("mongodb connected✅");
     } catch (err) {
         console.error(err);
@@ -598,23 +1713,43 @@ export const errorHandler = (err, req, res, next) => {
 };
 </file>
 
-<file path="vue-client/src/stores/auth.js">
-import { reactive } from "vue";
-export const authState = reactive({
-    token: localStorage.getItem("token"),
-    user: JSON.parse(localStorage.getItem("user"))
+<file path="vue-client/src/services/auth.service.js">
+import api from "./api.js"
+export const login = async (payload) => {
+	const res = await api.post(`/api/v1/auth/login`, payload)
+	return res.data
+}
+export const signup = async (payload) => {
+	const res = await api.post(`/api/v1/auth/signup`, payload)
+	return res.data
+}
+</file>
+
+<file path="vue-client/src/views/DashboardView.vue">
+<script setup>
+import { ref, onMounted, computed } from 'vue';
+import { authState } from '../stores/auth.js';
+import taskService from '../services/task.service.js';
+const tasks = ref([]);
+const loading = ref(true);
+onMounted(async () => {
+try {
+const res = await taskService.getMyTasks();
+tasks.value = res.data.data.tasks;
+} finally { loading.value = false; }
 });
-export const setAuth = (token, user) => {
-    (authState.token = token), (authState.user = user);
-    localStorage.setItem("token", token);
-    localStorage.setItem('user',JSON.stringify(user));
-};
-export const logout = () => {
-    authState.token = null;
-    authState.user = null;
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-};
+const total = computed(() => tasks.value.length);
+const done = computed(() => tasks.value.filter(t => t.completed).length);
+const pending = computed(() => total.value - done.value);
+const pct = computed(() =>
+total.value === 0 ? 0 : Math.round((done.value / total.value) * 100));
+</script>
+<template>
+<div>
+<h2>Hi {{ authState.user?.name }}</h2>
+<p>{{ pending }} tasks remaining · {{ pct }}% complete</p>
+</div>
+</template>
 </file>
 
 <file path="vue-client/src/views/SignupView.vue">
@@ -642,7 +1777,7 @@ const handleSignup = async () => {
             password: password.value
         });
         setAuth(res.token, res.data.user);
-        router.push("/dashboard");
+        router.push("/tasks");
     } catch (err) {
         console.error("signup error", err);
         error.value = err.response?.data?.message || "Something went wrong";
@@ -805,7 +1940,7 @@ const handleSignup = async () => {
 
 .submit-btn {
     padding: 14px 24px;
-    background:hsl(190.3,0%,11.8%);
+    background: hsl(190.3, 0%, 11.8%);
     color: white;
     border: none;
     border-radius: 8px;
@@ -856,39 +1991,47 @@ import { catchAsync } from "../utils/catchAsync.js";
 import { signToken } from "../utils/signToken.js";
 
 export const signup = catchAsync(async (req, res, next) => {
-    const user = await User.create({
-        name: req.body.name,
-        email: req.body.email,
-        password: req.body.password
-    });
-    const token = signToken(user._id);
-    user.password = undefined;
-    res.status(201).json({
-        status: "success",
-        token,
-        data: {
-            user
-        }
-    });
+const { name, email, password} = req.body;
+if (!name||!email||!password){
+return next(new AppError("Name, email and password are required", 400))
+}
+if (typeof password !== 'string' || password.length < 8){
+return next(new AppError("Password must be atleast 8 characters"))
+}
+const user = await User.create({
+name,
+email,
+password
+
+});
+const token = signToken(user._id);
+user.password = undefined;
+res.status(201).json({
+status: "success",
+token,
+data: {
+user
+}
+});
 });
 export const login = catchAsync(async (req, res, next) => {
-    const { email, password } = req.body;
-    if (!email || !password) {
-        return next(new AppError("please provide email and password ", 400));
-    }
-    const user = await User.findOne({ email }).select("+password ");
-    if (!user || !(await user.correctPassword(password, user.password))) {
-        return next(new AppError("incorrect email or password", 400));
-    }
-    const token = signToken(user._id);
-    user.password = undefined
-    res.status(200).json({
-        status: "success",
-        token,
-        data: {
-            user
-        }
-    });
+const { email, password } = req.body;
+if (!email || !password) {
+return next(new AppError("please provide email and password ", 400));
+}
+const user = await User.findOne({ email }).select("+password ");
+if (!user || !(await user.correctPassword(password, user.password))) {
+return next(new AppError("incorrect email or password", 400));
+}
+const token = signToken(user._id);
+user.password = undefined
+res.status(200).json({
+status: "success",
+token,
+data: {
+user
+}
+});
 });
 </file>
 
@@ -907,13 +2050,36 @@ const startServer = async () => {
 startServer();
 </file>
 
-<file path="vue-client/src/main.js">
-import { createApp } from 'vue'
-import './style.css'
-import App from './App.vue'
-import router from "./router/index.js"
+<file path="vue-client/src/stores/auth.js">
+import { reactive } from "vue";
+export const authState = reactive({
+    user: null,
+    token: null,
+    initialized: false
+});
+export const restoreAuth = () => {
+    const token = localStorage.getItem("token")
+    const user = localStorage.getItem("user")
 
-createApp(App).use(router).mount('#app')
+    if (token && user) {
+        authState.user = JSON.parse(user)
+        authState.token = token
+    }
+    authState.initialized = true;
+}
+export const setAuth = (token, user) => {
+    authState.token = token
+    authState.user = user;
+    localStorage.setItem("token", token);
+    localStorage.setItem('user', JSON.stringify(user));
+};
+export const logout = () => {
+    authState.token = null;
+    authState.user = null;
+    authState.initialized = true;
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+};
 </file>
 
 <file path="vue-client/src/views/LoginView.vue">
@@ -939,11 +2105,10 @@ const handleLogin = async () => {
             password: password.value
         });
         setAuth(res.token, res.data.user);
-        router.push("/dashboard");
+        router.push("/tasks");
     } catch (err) {
         console.error("Login error:", err);
-        error.value =
-            err.response?.data?.message || "Invalid email or password";
+        error.value =    err.response?.data?.message || "Invalid email or password";
     } finally {
         loading.value = false;
     }
@@ -1134,25 +2299,78 @@ const handleLogin = async () => {
 </style>
 </file>
 
-<file path="src/app.js">
-import express from "express";
-import healthRoutes from "./routes/health.routes.js";
-import usersRoutes from "./routes/users.routes.js";
-import testRoutes from "./routes/test.routes.js";
-import authRoutes from "./routes/auth.routes.js";
-import { errorHandler } from "./middleware/error.middleware.js";
-import { AppError } from "./utils/appError.js";
-const app = express();
-app.use(express.json());
-app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1", testRoutes);
-app.use("/api/v1", healthRoutes);
-app.use("/api/v1", usersRoutes);
-app.use((req, res, next) => {
-    next(new AppError(`cannot find ${req.originalUrl} on this server`, 404));
-});
-app.use(errorHandler);
-export default app;
+<file path="vue-client/src/App.vue">
+<script setup>
+import { authState, logout } from "./stores/auth.js";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
+const handleLogout = () => {
+    logout();
+    router.push("/login");
+};
+</script>
+
+<template>
+    <nav v-if="authState.user" class="app-nav">
+        <router-link to="/tasks">My Tasks</router-link>
+        <router-link to="/dashboard">Dashboard</router-link>
+        <router-link v-if="authState.user?.role === 'admin'" to="/admin">Admin</router-link>
+        <button @click="handleLogout" class="logout-btn">Logout</button>
+    </nav>
+
+    <router-view />
+</template>
+
+<style scoped>
+.app-nav {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 24px;
+    background: #111827;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.app-nav a {
+    color: #9ca3af;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.15s;
+}
+.app-nav a:hover,
+.app-nav a.router-link-active {
+    color: #f59e0b;
+}
+.logout-btn {
+    margin-left: auto;
+    padding: 6px 14px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 6px;
+    color: #9ca3af;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.logout-btn:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+}
+</style>
+</file>
+
+<file path="vue-client/src/main.js">
+import { createApp } from 'vue'
+import './style.css'
+import App from './App.vue'
+import router from "./router/index.js"
+import { restoreAuth } from "./stores/auth.js"
+restoreAuth()
+createApp(App)
+    .use(router)
+    .mount('#app')
 </file>
 
 <file path="src/models/user.model.js">
@@ -1178,15 +2396,15 @@ const userSchema = new mongoose.Schema(
             minlength: 8,
             select: false
         },
-        role:{
-        	type:String,
-        	enum:["admin","user"],
-        	default:"user"
+        role: {
+            type: String,
+            enum: ["admin", "user"],
+            default: "user"
         }
     },
-    { timestamp: true }
+    { timestamps: true }
 );
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function () {
     if (!this.isModified("password")) return;
     this.password = await bcrypt.hash(this.password, 12);
 
@@ -1200,14 +2418,69 @@ userSchema.methods.correctPassword =
 export const User = mongoose.model("user", userSchema);
 </file>
 
-<file path="vue-client/src/App.vue">
-<script setup></script>
-<template>
-    <router-link to="/login">Login</router-link>
-    <router-link to="/signup">Signup</router-link>
-    <router-view />
-</template>
-<style scoped></style>
+<file path="src/app.js">
+import express from "express";
+import {config }from "./config/config.js"
+import hpp from "hpp";
+import cors from "cors";
+import { sanitize } from "./middleware/sanitize.middleware.js";
+import rateLimit from "express-rate-limit";
+import helmet from "helmet";
+import healthRoutes from "./routes/health.routes.js";
+import usersRoutes from "./routes/users.routes.js";
+import testRoutes from "./routes/test.routes.js";
+import authRoutes from "./routes/auth.routes.js";
+import taskRoutes from "./routes/task.routes.js";
+import { errorHandler } from "./middleware/error.middleware.js";
+import { AppError } from "./utils/appError.js";
+
+const app = express();
+
+const limiter = rateLimit({
+limit: 100,
+windowMs: 60 * 60 * 1000,
+message: "Too many requests from this ip, please try again later."
+});
+// 1. CORS first — preflight requests need this before anything else
+app.use(cors({
+origin: "http://localhost:5173" || config.clientUrl,
+credentials: true
+}));
+
+// 2. Helmet — security headers early
+app.use(helmet());
+
+// 3. Body parsers — BOTH json AND urlencoded, before hpp
+app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // ← ADD THIS
+
+// 4. hpp — needs body to already be parsed
+app.use(hpp({
+    whitelist: ["sort", "fields", "page", "limit","completed"]
+}));
+
+app.use(sanitize);
+
+// 6. Rate limiter
+app.use("/api", limiter);
+
+// 7. Routes last
+
+app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1", testRoutes);
+app.use("/api/v1", healthRoutes);
+app.use("/api/v1", usersRoutes);
+app.use("/api/v1/tasks", taskRoutes);
+
+// ✅ 404 Handler
+app.use((req, res, next) => {
+next(new AppError(`cannot find ${req.originalUrl} on this server`, 404));
+});
+
+// ✅ Global Error Handler
+app.use(errorHandler);
+
+export default app;
 </file>
 
 <file path="package.json">
@@ -1228,8 +2501,13 @@ export const User = mongoose.model("user", userSchema);
   "dependencies": {
     "axios": "^1.13.2",
     "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^8.3.0",
+    "helmet": "^8.1.0",
+    "hpp": "^0.2.3",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.1.2"
   }
@@ -1242,51 +2520,90 @@ import LoginView from "../views/LoginView.vue";
 import SignupView from "../views/SignupView.vue";
 import UserProfileView from "../views/UserProfileView.vue";
 import DashboardView from "../views/DashboardView.vue";
-import { authState } from "../stores/auth.js"
+import TasksView from "../views/TasksView.vue";
+import TaskDetailsView from "../views/TaskDetailsView.vue";
+import { authState } from "../stores/auth.js";
+
 const routes = [
+    // Root: send authenticated users to /tasks, others to /login
+    {
+        path: "/",
+        redirect: () => (authState.user ? "/tasks" : "/login"),
+    },
     {
         path: "/login",
-        component: LoginView
+        component: LoginView,
+        meta: { guestOnly: true },
+    },
+    {
+        path: "/signup",
+        component: SignupView,
+        meta: { guestOnly: true },
+    },
+    {
+        path: "/tasks",
+        name: "tasks",
+        component: TasksView,
+        meta: { requiresAuth: true },
+    },
+    {
+        path: "/tasks/:id",
+        name: "task-detail",
+        component: TaskDetailsView,
+        meta: { requiresAuth: true },
     },
     {
         path: "/dashboard",
         component: DashboardView,
-        meta: { requiresAuth: true }
-    },
-    {
-        path: "/signup",
-        component: SignupView
+        meta: { requiresAuth: true },
     },
     {
         path: "/users/:id",
-        component: UserProfileView
+        component: UserProfileView,
+        meta: { requiresAuth: true },
     },
     {
         path: "/admin",
-        component: () => import('../views/Admin.vue'),
-        meta: {
-            requiresAuth: true,
-            requiresRole: 'admin'
-        }
-    }
+        component: () => import("../views/Admin.vue"),
+        meta: { requiresAuth: true, requiresRole: "admin" },
+    },
+    // Catch-all fallback
+    {
+        path: "/:pathMatch(.*)*",
+        redirect: "/",
+    },
 ];
+
 const router = createRouter({
     history: createWebHistory(),
-    routes
+    routes,
 });
-router.beforeEach((to, from, next) => {
-    const user = authState.user
-    if (to.meta.requiresAuth && !user) {
-        return next("/login")
-    }
-    if (to.meta.requiresRole && useTransition.role && to.meta.requiresRole) {
-        return next("/dashboard")
-    }
-    else {
-        next()
-    }
-})
 
+router.beforeEach((to, from, next) => {
+    // Wait for localStorage restore to finish before navigating
+    if (!authState.initialized) {
+        
+    }
+
+    const user = authState.user;
+
+    // Redirect logged-in users away from guest-only pages (login / signup)
+    if (to.meta.guestOnly && user) {
+        return next("/tasks");
+    }
+
+    // Redirect unauthenticated users away from protected pages
+    if (to.meta.requiresAuth && !user) {
+        return next("/login");
+    }
+
+    // Redirect users without the required role back to tasks
+    if (to.meta.requiresRole && (!user || user.role !== to.meta.requiresRole)) {
+        return next("/tasks");
+    }
+
+    next();
+});
 
 export default router;
 </file>

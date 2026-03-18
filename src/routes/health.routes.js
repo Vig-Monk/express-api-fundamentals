@@ -2,7 +2,11 @@ import express from "express";
 import { AppError } from "../utils/appError.js";
 const router = express.Router();
 router.get("/health", (req, res) => {
-    throw new AppError("Health check Failed", 404);
+    res.status(200).json({
+    	status:'ok',
+    	uptime:process.uptime(),
+    	timestamp:new Date().toISOstring()
+    })
 });
 
 export default router;

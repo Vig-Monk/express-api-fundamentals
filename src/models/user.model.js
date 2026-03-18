@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+
 const userSchema = new mongoose.Schema(
     {
         name: {
@@ -26,17 +27,29 @@ const userSchema = new mongoose.Schema(
             default: "user"
         }
     },
-    { timestamps: true }
+    {
+        timestamps: true,
+        toJSON: {
+            virtuals: true,
+            // Ensure _id is always serialised as a plain string, never an ObjectId object
+            transform(doc, ret) {
+                ret._id = ret._id.toString();
+                ret.id  = ret._id;
+                delete ret.__v;
+                return ret;
+            }
+        },
+        toObject: { virtuals: true }
+    }
 );
-userSchema.pre("save", async function (next) {
+
+userSchema.pre("save", async function () {
     if (!this.isModified("password")) return;
     this.password = await bcrypt.hash(this.password, 12);
-
 });
-userSchema.methods.correctPassword =
-    async function (candidatePassword, userPassword) {
-        return await bcrypt.compare(candidatePassword, userPassword);
-    }
 
+userSchema.methods.correctPassword = async function (candidatePassword, userPassword) {
+    return await bcrypt.compare(candidatePassword, userPassword);
+};
 
 export const User = mongoose.model("user", userSchema);
