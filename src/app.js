@@ -22,8 +22,8 @@ message: "Too many requests from this ip, please try again later."
 });
 // 1. CORS first — preflight requests need this before anything else
 app.use(cors({
-origin: "http://localhost:5173" || config.clientUrl,
-credentials: true
+    origin: config.env === "production" ? config.clientUrl : "http://localhost:5173",
+    credentials: true
 }));
 
 // 2. Helmet — security headers early

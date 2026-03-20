@@ -5,7 +5,7 @@ router.get("/health", (req, res) => {
     res.status(200).json({
     	status:'ok',
     	uptime:process.uptime(),
-    	timestamp:new Date().toISOstring()
+    	timestamp:new Date().toISOString()
     })
 });
 
