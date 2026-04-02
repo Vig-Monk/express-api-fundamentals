@@ -20,30 +20,30 @@ limit: 100,
 windowMs: 60 * 60 * 1000,
 message: "Too many requests from this ip, please try again later."
 });
-// 1. CORS first — preflight requests need this before anything else
+// CORS— preflight requests need this before anything else
 app.use(cors({
-    origin: config.env === "production" ? config.clientUrl : "http://localhost:5173",
-    credentials: true
+origin: config.env === "production" ? config.clientUrl: "http://localhost:5173",
+credentials: true
 }));
 
-// 2. Helmet — security headers early
+//Helmet — security headers early
 app.use(helmet());
 
-// 3. Body parsers — BOTH json AND urlencoded, before hpp
+//Body parsers — BOTH json AND urlencoded, before hpp
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // ← ADD THIS
+app.use(express.urlencoded({ extended: true }));
 
-// 4. hpp — needs body to already be parsed
+// hpp — needs body to already be parsed
 app.use(hpp({
-    whitelist: ["sort", "fields", "page", "limit","completed"]
+whitelist: ["sort", "fields", "page", "limit", "completed"]
 }));
 
 app.use(sanitize);
 
-// 6. Rate limiter
+// Rate limiter
 app.use("/api", limiter);
 
-// 7. Routes last
+// Routes last
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1", testRoutes);
