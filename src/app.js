@@ -20,9 +20,23 @@ limit: 100,
 windowMs: 60 * 60 * 1000,
 message: "Too many requests from this ip, please try again later."
 });
-// CORS— preflight requests need this before anything else
+
+const allowedOrigins = [
+"http://localhost:5173",
+"https://ludwigs-tasky.vercel.app"
+];
+
 app.use(cors({
-origin: config.env === "production" ? config.clientUrl: "http://localhost:5173",
+origin: function (origin, callback) {
+
+if (!origin) return callback(null, true);
+
+if (allowedOrigins.includes(origin)) {
+return callback(null, true);
+} else {
+return callback(new Error("Not allowed by CORS"));
+}
+},
 credentials: true
 }));
 
