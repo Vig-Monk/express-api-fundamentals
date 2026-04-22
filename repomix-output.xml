@@ -1,10 +1,10 @@
-This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+This file is a merged representation of a subset of the codebase, containing files not matching ignore patterns, combined into a single document by Repomix.
 
 <file_summary>
 This section contains a summary of this file.
 
 <purpose>
-This file contains a packed representation of the entire repository's contents.
+This file contains a packed representation of a subset of the repository's contents that is considered the most important context.
 It is designed to be easily consumable by AI systems for analysis, code review,
 or other automated processes.
 </purpose>
@@ -32,6 +32,7 @@ The content is organized as follows:
 <notes>
 - Some files may have been excluded based on .gitignore rules and Repomix's configuration
 - Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching these patterns are excluded: node_modules, package-lock.json, dist, *.png, *.jpg, *.svg, .git
 - Files matching patterns in .gitignore are excluded
 - Files matching default ignore patterns are excluded
 - Files are sorted by Git change count (files with more changes are at the bottom)
@@ -99,11 +100,20 @@ vue-client/
   README.md
   vite.config.js
 .gitignore
+flow.readme.md
 package.json
 </directory_structure>
 
 <files>
 This section contains the contents of the repository's files.
+
+<file path="flow.readme.md">
+--- Database Connection ---
+src/config/database.js
+connectDb function ---> calls mongoose.connect(connection-string) an async opp
+on error fails fast process.exit(1)
+called on server start fails fast incase of err server doesn't start
+</file>
 
 <file path="src/middleware/sanitize.middleware.js">
 export const sanitize = (req, res, next) => {
@@ -1979,21 +1989,6 @@ export const errorHandler = (err, req, res, next) => {
 };
 </file>
 
-<file path="src/routes/health.routes.js">
-import express from "express";
-import { AppError } from "../utils/appError.js";
-const router = express.Router();
-router.get("/health", (req, res) => {
-    res.status(200).json({
-    	status:'ok',
-    	uptime:process.uptime(),
-    	timestamp:new Date().toISOString()
-    })
-});
-
-export default router;
-</file>
-
 <file path="src/routes/task.routes.js">
 import express from "express";
 import { protect } from "../middleware/auth.middleware.js";
@@ -2991,19 +2986,19 @@ export const connectDB = async () => {
 };
 </file>
 
-<file path="src/server.js">
-import { connectDB } from "./config/database.js";
-import app from "./app.js";
-import { config } from "./config/config.js";
-const PORT = config.port;
-const startServer = async () => {
-    await connectDB();
+<file path="src/routes/health.routes.js">
+import express from "express";
+import { AppError } from "../utils/appError.js";
+const router = express.Router();
+router.get("/health", (req, res) => {
+    res.status(200).json({
+    	status:'ok',
+    	uptime:process.uptime(),
+    	timestamp:new Date().toISOString()
+    })
+});
 
-    app.listen(PORT, err => {
-        console.log(`Server is running on port ${PORT}`);
-    });
-};
-startServer();
+export default router;
 </file>
 
 <file path="vue-client/src/services/auth.service.js">
@@ -3897,6 +3892,20 @@ user
 });
 </file>
 
+<file path="src/server.js">
+import { connectDB } from "./config/database.js";
+import app from "./app.js";
+import { config } from "./config/config.js";
+const PORT = config.port;
+const startServer = async () => {
+    await connectDB();
+    app.listen(PORT, err => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+};
+startServer();
+</file>
+
 <file path="vue-client/src/main.js">
 import { createApp } from 'vue'
 import './style.css'
@@ -4675,71 +4684,6 @@ userSchema.methods.correctPassword = async function (candidatePassword, userPass
 export const User = mongoose.model("user", userSchema);
 </file>
 
-<file path="src/app.js">
-import express from "express";
-import {config }from "./config/config.js"
-import hpp from "hpp";
-import cors from "cors";
-import { sanitize } from "./middleware/sanitize.middleware.js";
-import rateLimit from "express-rate-limit";
-import helmet from "helmet";
-import healthRoutes from "./routes/health.routes.js";
-import usersRoutes from "./routes/users.routes.js";
-import testRoutes from "./routes/test.routes.js";
-import authRoutes from "./routes/auth.routes.js";
-import taskRoutes from "./routes/task.routes.js";
-import { errorHandler } from "./middleware/error.middleware.js";
-import { AppError } from "./utils/appError.js";
-
-const app = express();
-
-const limiter = rateLimit({
-limit: 100,
-windowMs: 60 * 60 * 1000,
-message: "Too many requests from this ip, please try again later."
-});
-// 1. CORS first — preflight requests need this before anything else
-app.use(cors({
-origin: "http://localhost:5173" || config.clientUrl,
-credentials: true
-}));
-
-// 2. Helmet — security headers early
-app.use(helmet());
-
-// 3. Body parsers — BOTH json AND urlencoded, before hpp
-app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // ← ADD THIS
-
-// 4. hpp — needs body to already be parsed
-app.use(hpp({
-    whitelist: ["sort", "fields", "page", "limit","completed"]
-}));
-
-app.use(sanitize);
-
-// 6. Rate limiter
-app.use("/api", limiter);
-
-// 7. Routes last
-
-app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1", testRoutes);
-app.use("/api/v1", healthRoutes);
-app.use("/api/v1", usersRoutes);
-app.use("/api/v1/tasks", taskRoutes);
-
-// ✅ 404 Handler
-app.use((req, res, next) => {
-next(new AppError(`cannot find ${req.originalUrl} on this server`, 404));
-});
-
-// ✅ Global Error Handler
-app.use(errorHandler);
-
-export default app;
-</file>
-
 <file path="package.json">
 {
   "name": "express-api-fundamentals",
@@ -4877,6 +4821,85 @@ router.beforeEach((to, from, next) => {
 });
 
 export default router;
+</file>
+
+<file path="src/app.js">
+import express from "express";
+import {config }from "./config/config.js"
+import hpp from "hpp";
+import cors from "cors";
+import { sanitize } from "./middleware/sanitize.middleware.js";
+import rateLimit from "express-rate-limit";
+import helmet from "helmet";
+import healthRoutes from "./routes/health.routes.js";
+import usersRoutes from "./routes/users.routes.js";
+import testRoutes from "./routes/test.routes.js";
+import authRoutes from "./routes/auth.routes.js";
+import taskRoutes from "./routes/task.routes.js";
+import { errorHandler } from "./middleware/error.middleware.js";
+import { AppError } from "./utils/appError.js";
+
+const app = express();
+
+const limiter = rateLimit({
+limit: 100,
+windowMs: 60 * 60 * 1000,
+message: "Too many requests from this ip, please try again later."
+});
+
+const allowedOrigins = [
+"http://localhost:5173",
+"https://ludwigs-tasky.vercel.app"
+];
+
+app.use(cors({
+origin: function (origin, callback) {
+
+if (!origin) return callback(null, true);
+
+if (allowedOrigins.includes(origin)) {
+return callback(null, true);
+} else {
+return callback(new Error("Not allowed by CORS"));
+}
+},
+credentials: true
+}));
+
+//Helmet — security headers early
+app.use(helmet());
+
+//Body parsers — BOTH json AND urlencoded, before hpp
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// hpp — needs body to already be parsed
+app.use(hpp({
+whitelist: ["sort", "fields", "page", "limit", "completed"]
+}));
+
+app.use(sanitize);
+
+// Rate limiter
+app.use("/api", limiter);
+
+// Routes last
+
+app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1", testRoutes);
+app.use("/api/v1", healthRoutes);
+app.use("/api/v1", usersRoutes);
+app.use("/api/v1/tasks", taskRoutes);
+
+// ✅ 404 Handler
+app.use((req, res, next) => {
+next(new AppError(`cannot find ${req.originalUrl} on this server`, 404));
+});
+
+// ✅ Global Error Handler
+app.use(errorHandler);
+
+export default app;
 </file>
 
 </files>
