@@ -29,7 +29,7 @@ const closeMenu = () => { menuOpen.value = false; };
             <!-- Brand -->
             <router-link to="/tasks" class="nav-brand" @click="closeMenu">
                 <span class="brand-dot" />
-                <span class="brand-name">Taskr</span>
+                <span class="brand-name">Tasky</span>
             </router-link>
 
             <!-- Desktop links -->
